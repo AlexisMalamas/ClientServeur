@@ -19,7 +19,7 @@ public class EchoServer {
 
 		try
 		{
-			
+			System.out.println("RAAAAAAh");
 			System.out.println("--- SERVEUR ---");
 			
 			int port = Integer.parseInt(args[0]);
