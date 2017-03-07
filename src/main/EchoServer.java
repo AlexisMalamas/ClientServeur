@@ -20,7 +20,7 @@ public class EchoServer {
 		try
 		{
 			
-			System.out.println("--- SERVEUR ---");
+			System.out.println("---- SERVEUR ----");
 			
 			int port = Integer.parseInt(args[0]);
 			System.out.println("port:"+port);

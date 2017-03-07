@@ -11,7 +11,7 @@ public class Client {
 	{
 		try
 		{
-			System.out.println("--- CLIENT ---");
+			System.out.println("---- CLIENT ----");
 			
 			int port = Integer.parseInt(args[0]);
 			Socket sock = new Socket(InetAddress.getLocalHost(),port);
