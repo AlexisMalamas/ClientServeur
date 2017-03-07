@@ -21,7 +21,7 @@ public class EchoServer {
 		{
 			System.out.println("---- SERVEUR ----");
 			
-			int port = Integer.parseInt(args[0]);
+			int port = 1234;
 			System.out.println("port:"+port);
 			serv = new ServerSocket(port);
 			String command = "";

@@ -13,7 +13,7 @@ public class Client {
 		{
 			System.out.println("---- CLIENT ----");
 			
-			int port = Integer.parseInt(args[0]);
+			int port = 1234;
 			Socket sock = new Socket(InetAddress.getLocalHost(),port);
 			
 			BufferedReader inchan = new BufferedReader(new InputStreamReader(sock.getInputStream()));
