@@ -19,6 +19,8 @@ public class EchoServer {
 
 		try
 		{
+			System.out.println("RAAAAAAh");
+			System.out.println("--- SERVEUR ---");
 			
 			System.out.println("---- SERVEUR ----");
 			
