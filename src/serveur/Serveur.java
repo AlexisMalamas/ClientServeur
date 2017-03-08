@@ -9,7 +9,7 @@ public class Serveur {
 
 
 	private ServerSocket serverSocket;
-	private ArrayList<String> joueurs;
+	private ArrayList<Joueur> joueurs;
 	public final static int port=2017;
 
 	public Serveur(){
@@ -29,7 +29,7 @@ public class Serveur {
 
 					while(true){
 						Socket clientSocket = serverSocket.accept();
-						new Thread().start(); // à completer
+						new Thread(new Joueur(clientSocket, Serveur.this)).start(); // à completer
 					}
 					
 				} catch (IOException e) {

@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import protocole.Protocole;
+
 public class Joueur extends Thread {
 
 
@@ -17,8 +19,8 @@ public class Joueur extends Thread {
 	private BufferedReader inchan;
 	private Serveur serveur;
 
-	private boolean isHere; 
-	private boolean isWaiting;
+	private boolean estConnecte; 
+	private boolean enAttente;
 
 	public Joueur(Socket socket,Serveur serveur){
 
@@ -26,7 +28,7 @@ public class Joueur extends Thread {
 		this.serveur=serveur;
 		this.score=0;
 
-		this.isHere=true;
+		this.estConnecte=true;
 
 		try {
 			outchan = new PrintWriter(socket.getOutputStream());
@@ -44,15 +46,46 @@ public class Joueur extends Thread {
 	@Override
 	public void run() {
 		try {
-			while(isHere){
+			while(estConnecte){
 				informationFromJoueur();
 			}
-		} catch (IOException e) {
-			System.out.println("(Joueur run) Le Joueur "+ pseudo +" est parti");
-			serveur.removeJoueur(this);
-		} catch (Exception e) {
+		}catch (Exception e) {
 			System.out.println("(Joueur run) Exception : "+e.toString());
 		}
+	}
+	
+	public void informationFromJoueur(){
+		String msg = "";
+		while(msg.isEmpty() || !msg.contains("/")){
+			try {
+				msg = inchan.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if(msg==null) msg = "";
+			
+			System.out.println("(SERVER) informationFromJoueur reçoit : "+msg);
+			
+			String[] msgs = msg.split("/");
+			String cmd = msgs[0];
+			
+			if (Protocole.CONNEXION.name().equals(cmd)) {
+				try{
+					this.pseudo = msgs[1];
+					System.out.println("Connexion de " + this.pseudo);
+				}catch (Exception e) {
+					System.err.println("Erreur : Pas de pseudos donné.");
+				}
+			}else if(Protocole.SORT.name().equals(cmd)){
+				estConnecte = false;
+				System.out.println("Déonnexion de " + this.pseudo);
+			
+			}else if(Protocole.TROUVE.name().equals(cmd)){
+				// à compléter plus tard
+			}
+		}
+		
+		
 	}
 
 	public String getPseudo() {
@@ -103,20 +136,20 @@ public class Joueur extends Thread {
 		this.serveur = serveur;
 	}
 
-	public boolean isHere() {
-		return isHere;
+	public boolean getEstConnecte() {
+		return estConnecte;
 	}
 
-	public void setHere(boolean isHere) {
-		this.isHere = isHere;
+	public void setEstConnecte(boolean isHere) {
+		this.estConnecte = isHere;
 	}
 
-	public boolean isWaiting() {
-		return isWaiting;
+	public boolean getEnAttente() {
+		return enAttente;
 	}
 
-	public void setWaiting(boolean isWaiting) {
-		this.isWaiting = isWaiting;
+	public void setEnAttente(boolean isWaiting) {
+		this.enAttente = isWaiting;
 	}
 
 
