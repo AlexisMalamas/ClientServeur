@@ -72,13 +72,15 @@ public class Joueur extends Thread {
 			if (Protocole.CONNEXION.name().equals(cmd)) {
 				try{
 					this.pseudo = msgs[1];
-					System.out.println("Connexion de " + this.pseudo);
+					System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
 				}catch (Exception e) {
 					System.err.println("Erreur : Pas de pseudos donné.");
 				}
 			}else if(Protocole.SORT.name().equals(cmd)){
-				estConnecte = false;
-				System.out.println("Déonnexion de " + this.pseudo);
+				if(this.pseudo.equals(msgs[1])){
+					estConnecte = false;
+					System.out.println("Déonnexion de " + this.pseudo);
+				}
 			
 			}else if(Protocole.TROUVE.name().equals(cmd)){
 				// à compléter plus tard

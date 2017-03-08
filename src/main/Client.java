@@ -32,9 +32,9 @@ public class Client {
 				System.out.println("envoie de "+ligne);
 				canalEcriture.println(ligne);
 				canalEcriture.flush();
-				ligne = inchan.readLine();
+				//ligne = inchan.readLine();
 
-				System.out.println("!"+ligne);
+				//System.out.println("!"+ligne);
 				
 				
 			}
