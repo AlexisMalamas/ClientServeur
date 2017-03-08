@@ -56,7 +56,6 @@ public class Joueur extends Thread {
 	
 	public void informationFromJoueur(){
 		String msg = "";
-		while(msg.isEmpty() || !msg.contains("/")){
 			try {
 				msg = inchan.readLine();
 			} catch (IOException e) {
@@ -84,8 +83,9 @@ public class Joueur extends Thread {
 			
 			}else if(Protocole.TROUVE.name().equals(cmd)){
 				// à compléter plus tard
-			}
-		}
+			}else
+				System.out.println("L'information reçue ne correspond pas à notre protocole");
+
 		
 		
 	}
