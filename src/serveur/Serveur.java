@@ -31,8 +31,9 @@ public class Serveur {
 					System.out.println("Attente connexion joueurs.");
 
 					while(true){
+						
 						Socket clientSocket = serverSocket.accept();
-						new Joueur(clientSocket, Serveur.this).start(); 
+						new Joueur(clientSocket, Serveur.this).start();
 					}
 
 				} catch (IOException e) {
@@ -66,6 +67,11 @@ public class Serveur {
 		}
 		else
 		{
+			if(this.joueurs.size()==0)
+			{
+				this.session = new Session(this);
+				session.start();
+			}
 			this.joueurs.add(j); // on ajoute notre joueur connecté
 
 			try {
@@ -117,6 +123,11 @@ public class Serveur {
 			}
 		}
 
+	}
+	
+	public int nbPlayer()
+	{
+		return joueurs.size();
 	}
 
 }
