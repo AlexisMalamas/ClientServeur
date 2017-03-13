@@ -53,24 +53,45 @@ public class Serveur {
 		server.run();
 	}
 
-	 public void addJoueur(Joueur j){
-		this.joueurs.add(j); // on ajoute notre joueur connecté
+	public void addJoueur(Joueur j){
 
-		try {
-			j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,j.getPseudo())); //A modif j.getPseudo par les vraies arguments placement/tirage/scores
-			if(joueurs.size() == 1){}
-				//this.session.start();  //A remettre quand session sera fait
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(pseudoAlreadyUsed(j.getPseudo()))
+		{
+			try {
+				j.sendToJoueur(ProtocoleCreateur.create(Protocole.REFUS));
+				// ptete stopper le thread Joueur
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
+		else
+		{
+			this.joueurs.add(j); // on ajoute notre joueur connecté
+
+			try {
+				j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,j.getPseudo())); //A modif j.getPseudo par les vraies arguments placement/tirage/scores
+				if(joueurs.size() == 1){}
+				//this.session.start();  //A remettre quand session sera fait
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
+		}
 	}
-	 
-	 public void removeJoueur(Joueur j){
-		 this.joueurs.remove(j);
-		 sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.DECONNEXION,j.getPseudo()), j.getPseudo());
-	 }
+
+	public boolean pseudoAlreadyUsed(String pseudo)
+	{
+		for(Joueur j : this.joueurs)
+			if(j.getPseudo().equals(pseudo))
+				return true;
+		return false;
+	}
+
+	public void removeJoueur(Joueur j){
+		this.joueurs.remove(j);
+		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.DECONNEXION,j.getPseudo()), j.getPseudo());
+	}
 
 	public void sendToAllJoueurButMe(String message, String joueurCourant){
 		System.out.println("oui");
@@ -84,7 +105,7 @@ public class Serveur {
 		}
 
 	}
-	
+
 	public void sendToAllJoueur(String message, String joueurCourant){
 		System.out.println("oui");
 		for(Joueur j:this.joueurs){

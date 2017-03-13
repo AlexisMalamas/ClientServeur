@@ -5,6 +5,7 @@ public enum Protocole {
 	// connexion
 		CONNEXION,
 		BIENVENUE,
+		REFUS,
 		CONNECTE,
 		
 		// deconnexion
