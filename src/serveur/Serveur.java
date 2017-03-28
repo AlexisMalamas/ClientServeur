@@ -13,6 +13,7 @@ public class Serveur {
 	private ServerSocket serverSocket;
 	private ArrayList<Joueur> joueurs;
 	public final static int port=2017;
+	public final static int capacite=2;
 	private Session session;
 
 	public Serveur(){

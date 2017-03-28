@@ -36,7 +36,15 @@ public enum Protocole {
 		FIN,
 		
 		//Phase de résultat
-		BILAN
+		BILAN,
 		
+		//Chat
+		ENVOI,
+		PENVOI,
+		RECEPTION,
+		PRECEPTION,
+		
+		//Meilleur mot
+		MEILLEUR
 		
 }
