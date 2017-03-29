@@ -55,7 +55,6 @@ public class Game {
 
 		String [] motPropose;
 		int score =0;
-
 		for(String mot : reponses){
 			motPropose = mot.split("");
 
@@ -121,37 +120,117 @@ public class Game {
 					
 	}
 	
-	public boolean placementValide(char[][] proposition){
+	// return list of created word or NULL if word wrong placed or don't exist
+	public ArrayList<String> createdWords(char[][] proposition)
+	{
+		ArrayList<String> wordsCreated = new ArrayList<String>();
+		boolean wordHorizontaly;
 		
-		ArrayList<String> mots = new ArrayList<String>();
-		String motTrouve="";
-		
-		if(plateauVide())
-			return true;
-		
-		for(int i=0;i<taille;i++){
-			for(int j=0;j<taille;j++){
-				
-				if(proposition[i][j]!=this.plateau[i][j]){
-					motTrouve+=proposition[i][j];
-					
+		int posI = -1;
+		int posJ = -1;
+		for(int i=0;i<taille;i++)
+			for(int j=0;j<taille;j++)
+				if(proposition[i][j]!=this.plateau[i][j] && posI ==-1 && posJ ==-1)
+				{
+					posI = i;
+					posJ = j;
 				}
-				
-				if(proposition[i][j]=='0' && motTrouve!=""){
-					
-				}
-					
+		
+		if(posI ==-1 || posJ ==-1)
+			return null;
+		
+		if(proposition[posI][posJ+1] != this.plateau[posI][posJ+1])
+			wordHorizontaly = true;
+		else
+			wordHorizontaly = false;
+		
+		String wordCreatedSameDirection = null;
+		if(!wordHorizontaly)
+		{
+			wordCreatedSameDirection = getWordCreatedSameDirectionVerticaly(posI, posJ, proposition);
+			boolean ajout = false;
+			for(int i= posI; proposition[i][posJ] !='0'; i++){
+				ajout = false;
+				String s = null;
+				if(posJ+1<taille)
+					if(this.plateau[i][posJ+1] != '0'){
+						s = getWordCreatedSameDirectionHorizontaly(i, posJ, proposition);
+						ajout = true;
+					}
+				if(posJ-1>=0 && !ajout)
+					if(this.plateau[i][posJ-1] != '0')
+						s = getWordCreatedSameDirectionHorizontaly(i, posJ, proposition);
+				if(s!=null)
+					wordsCreated.add(s);
 			}
 		}
+		else
+		{
+			wordCreatedSameDirection = getWordCreatedSameDirectionHorizontaly(posI, posJ, proposition);
+			boolean ajout = false;
+			for(int j= posJ; proposition[posI][j] !='0'; j++){
+				ajout = false;
+				String s = null;
+				if(posI+1<taille)
+					if(this.plateau[posI+1][j] != '0'){
+						s = getWordCreatedSameDirectionVerticaly(posI, j, proposition);
+						ajout = true;
+					}
+				if(posJ-1>=0 && !ajout)
+					if(this.plateau[posI-1][j] != '0')
+						s = getWordCreatedSameDirectionVerticaly(posI, j, proposition);
+				if(s!=null)
+					wordsCreated.add(s);
+			}
+		}
+		wordsCreated.add(wordCreatedSameDirection);
 		
-		if(motsValide(mots))
-			return true;
-		return true;
+		if(motsValide(wordsCreated))
+			return wordsCreated;
+		else
+			return null;
 	}
-
-	/*
-	 * A faire 
-	 * trouvermot()
-	 * 
-	 */
+	
+	public String getWordCreatedSameDirectionVerticaly( int posI, int posJ, char[][] proposition)
+	{
+		String word = null;
+		int j = posJ;
+		while(posJ>=0 && this.plateau[posI][posJ]!='0')
+		{
+			j=posJ;
+			posJ--;
+		}
+		
+		while(j<taille && this.plateau[posI][j]!='0' || proposition[posI][j] != '0')
+		{
+			if(this.plateau[posI][j]!='0')
+				word+=this.plateau[posI][j];
+			else
+				word+=proposition[posI][j];
+			j++;
+		}
+		return word;
+	}
+	
+	public String getWordCreatedSameDirectionHorizontaly( int posI, int posJ, char[][] proposition)
+	{
+		String word = null;
+		int i = posI;
+		while(posI>=0 && this.plateau[posI][posJ]!='0')
+		{
+			i=posI;
+			posI--;
+		}
+		
+		while(i<taille && this.plateau[i][posJ]!='0' || proposition[i][posJ] != '0')
+		{
+			if(this.plateau[i][posJ]!='0')
+				word+=this.plateau[i][posJ];
+			else
+				word+=proposition[i][posJ];
+			i++;
+		}
+		return word;
+	}
+	
 }

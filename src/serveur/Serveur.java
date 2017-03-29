@@ -55,7 +55,7 @@ public class Serveur {
 		server.run();
 	}
 
-	public void addJoueur(Joueur j){
+	synchronized public void addJoueur(Joueur j){
 
 		if(pseudoAlreadyUsed(j.getPseudo()))
 		{
@@ -68,17 +68,16 @@ public class Serveur {
 		}
 		else
 		{
-			if(this.joueurs.size()==0)
+			this.joueurs.add(j); // on ajoute notre joueur connecté
+			
+			if(this.joueurs.size()==1)
 			{
 				this.session = new Session(this);
 				session.start();
 			}
-			this.joueurs.add(j); // on ajoute notre joueur connecté
 
 			try {
 				j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,j.getPseudo())); //A modif j.getPseudo par les vraies arguments placement/tirage/scores
-				if(joueurs.size() == 1){}
-				//this.session.start();  //A remettre quand session sera fait
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -101,7 +100,6 @@ public class Serveur {
 	}
 
 	public void sendToAllJoueurButMe(String message, String joueurCourant){
-		System.out.println("oui");
 		for(Joueur j:this.joueurs){
 			try {
 				if(!j.getPseudo().equals(joueurCourant))
@@ -114,7 +112,6 @@ public class Serveur {
 	}
 
 	public void sendToAllJoueur(String message, String joueurCourant){
-		System.out.println("oui");
 		for(Joueur j:this.joueurs){
 			try {
 				if(!j.getPseudo().equals(joueurCourant))

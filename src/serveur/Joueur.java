@@ -100,7 +100,7 @@ public class Joueur extends Thread {
 
 		}
 
-		synchronized public void sendToJoueur(String message) throws IOException{
+		public void sendToJoueur(String message) throws IOException{
 			if(outchan!=null){
 				outchan.println(message);
 				outchan.flush();
