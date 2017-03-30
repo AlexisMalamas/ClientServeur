@@ -148,18 +148,10 @@ public class Game {
 		if(!wordHorizontaly)
 		{
 			wordCreatedSameDirection = getWordCreatedSameDirectionVerticaly(posI, posJ, proposition);
-			boolean ajout = false;
+			
 			for(int i= posI; proposition[i][posJ] !='0'; i++){
-				ajout = false;
 				String s = null;
-				if(posJ+1<taille)
-					if(this.plateau[i][posJ+1] != '0'){
-						s = getWordCreatedSameDirectionHorizontaly(i, posJ, proposition);
-						ajout = true;
-					}
-				if(posJ-1>=0 && !ajout)
-					if(this.plateau[i][posJ-1] != '0')
-						s = getWordCreatedSameDirectionHorizontaly(i, posJ, proposition);
+				s = getWordCreatedSameDirectionHorizontaly(i, posJ, proposition);
 				if(s!=null)
 					wordsCreated.add(s);
 			}
@@ -167,23 +159,17 @@ public class Game {
 		else
 		{
 			wordCreatedSameDirection = getWordCreatedSameDirectionHorizontaly(posI, posJ, proposition);
-			boolean ajout = false;
+			
 			for(int j= posJ; proposition[posI][j] !='0'; j++){
-				ajout = false;
+				
 				String s = null;
-				if(posI+1<taille)
-					if(this.plateau[posI+1][j] != '0'){
-						s = getWordCreatedSameDirectionVerticaly(posI, j, proposition);
-						ajout = true;
-					}
-				if(posJ-1>=0 && !ajout)
-					if(this.plateau[posI-1][j] != '0')
-						s = getWordCreatedSameDirectionVerticaly(posI, j, proposition);
+				s = getWordCreatedSameDirectionVerticaly(posI, j, proposition);
 				if(s!=null)
 					wordsCreated.add(s);
 			}
 		}
-		wordsCreated.add(wordCreatedSameDirection);
+		if(wordCreatedSameDirection != null)
+			wordsCreated.add(wordCreatedSameDirection);
 		
 		if(motsValide(wordsCreated))
 			return wordsCreated;
