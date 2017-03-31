@@ -22,36 +22,51 @@ public class Joueur extends Thread {
 	private boolean estConnecte; 
 	private boolean enAttente;
 
-	public Joueur(Socket socket,Serveur serveur){
-
-		this.socket=socket;
+	public Joueur(Serveur serveur){
 		this.serveur=serveur;
 		this.score=0;
-
 		this.estConnecte=true;
-
-		try {
-			outchan = new PrintWriter(socket.getOutputStream());
-		} catch (IOException e) {
-			System.out.println("(Joueur) : Récupération outputStream impossible.");
-		}
-		try {
-			inchan = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		} catch (IOException e) {
-			System.out.println("(Joueur) : Récupération inputStream impossible.");
-		}
 
 	}
 
 	@Override
 	public void run() {
+		Socket s = null;
+		while(true){
+			
+			
+			synchronized (this.serveur)
+		      {
+				//si personnne dans la file d'attente, on attend
+				if(this.serveur.getNbwait()==0)
+		          try { this.serveur.wait(); } catch(InterruptedException e) {e.printStackTrace();}
+		        s = this.serveur.removeFirstSocket();
+			  }
 
-		while(estConnecte){
+			try {
+				inchan = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			} catch (IOException e) {
+				System.out.println("(Joueur) : RÃ©cupÃ©ration inputStream impossible.");
+			}
+			try {
+				outchan = new PrintWriter(s.getOutputStream());
+			} catch (IOException e) {
+				System.out.println("(Joueur) : RÃ©cupÃ©ration outputStream impossible.");
+			}
+
+			this.socket=s;
 			try{
-				informationFromJoueur();
-				
+				while(estConnecte){
+					informationFromJoueur();
+				}
+				this.serveur.removeJoueur(this);
+
 			}catch (Exception e) {
 				System.out.println("(Joueur run) Exception : "+e.toString());
+				synchronized(this.serveur)
+				{
+					this.serveur.removeJoueur(this);
+				}
 				try {
 					socket.close();
 				} catch (IOException e1) {
@@ -61,119 +76,127 @@ public class Joueur extends Thread {
 		}
 	}
 
-		public void informationFromJoueur(){
-			String message = "";
-			while(message.isEmpty() || !message.contains("/")){
-				try {
-					message = inchan.readLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if(message==null) message = "";
+	public void informationFromJoueur(){
+		String message = "";
+		while(message.isEmpty() || !message.contains("/")){
+			try {
+				message = inchan.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			if(message==null) message = "";
+		}
 
-			System.out.println("(SERVER) informationFromJoueur reçoit : "+message);
+		System.out.println("(SERVER) informationFromJoueur reï¿½oit : "+message);
 
-			String[] infoMessages = message.split("/");
-			String cmd = infoMessages[0];
+		String[] infoMessages = message.split("/");
+		String cmd = infoMessages[0];
 
-			if (Protocole.CONNEXION.name().equals(cmd)) {
-				try{
-					this.pseudo = infoMessages[1];
-					System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
-					this.serveur.addJoueur(this);
-				}catch (Exception e) {
-					System.err.println("Erreur : CONNEXION.");
-					System.out.println(e);
-				}
-			}else if(Protocole.SORT.name().equals(cmd)){
-				if(this.pseudo.equals(infoMessages[1])){
-					this.estConnecte = false;
-					System.out.println("Déonnexion de " + this.pseudo);
+		if (Protocole.CONNEXION.name().equals(cmd)) {
+			try{
+
+				//if(serveur.pseudoAlreadyUsed(infoMessages[1]))
+				//serveur.envoiRefus(infoMessages[1]);
+
+				this.pseudo = infoMessages[1];
+				System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
+				synchronized (serveur){this.serveur.addJoueur(this);}
+			}catch (Exception e) {
+				System.err.println("Erreur : CONNEXION.");
+				System.out.println(e);
+			}
+		}else if(Protocole.SORT.name().equals(cmd)){
+			if(this.pseudo.equals(infoMessages[1])){
+				this.estConnecte = false;
+				synchronized(this.serveur)
+				{
 					this.serveur.removeJoueur(this);
 				}
-
-			}else if(Protocole.TROUVE.name().equals(cmd)){
-				// à compléter plus tard
-			}else
-				System.out.println("L'information reçue ne correspond pas à notre protocole");
-
-		}
-
-		synchronized public void sendToJoueur(String message) throws IOException{
-			if(outchan!=null){
-				outchan.println(message);
-				outchan.flush();
-				if(outchan.checkError()){
-					System.out.println("(sendToJoueur) "+pseudo+" est parti...");
-					throw new IOException();
-				}
+				System.out.println("DÃ©onnexion de " + this.pseudo);
+				
 			}
-		}
 
-		public String getPseudo() {
-			return pseudo;
-		}
-
-		public void setPseudo(String pseudo) {
-			this.pseudo = pseudo;
-		}
-
-		public int getScore() {
-			return score;
-		}
-
-		public void setScore(int score) {
-			this.score = score;
-		}
-
-		public Socket getSocket() {
-			return socket;
-		}
-
-		public void setSocket(Socket socket) {
-			this.socket = socket;
-		}
-
-		public PrintWriter getOutchan() {
-			return outchan;
-		}
-
-		public void setOutchan(PrintWriter outchan) {
-			this.outchan = outchan;
-		}
-
-		public BufferedReader getInchan() {
-			return inchan;
-		}
-
-		public void setInchan(BufferedReader inchan) {
-			this.inchan = inchan;
-		}
-
-		public Serveur getServeur() {
-			return serveur;
-		}
-
-		public void setServeur(Serveur serveur) {
-			this.serveur = serveur;
-		}
-
-		public boolean getEstConnecte() {
-			return estConnecte;
-		}
-
-		public void setEstConnecte(boolean isHere) {
-			this.estConnecte = isHere;
-		}
-
-		public boolean getEnAttente() {
-			return enAttente;
-		}
-
-		public void setEnAttente(boolean isWaiting) {
-			this.enAttente = isWaiting;
-		}
-
+		}else if(Protocole.TROUVE.name().equals(cmd)){
+			// ï¿½ complï¿½ter plus tard
+		}else
+			System.out.println("L'information reï¿½ue ne correspond pas ï¿½ notre protocole");
 
 	}
+
+	synchronized public void sendToJoueur(String message) throws IOException{
+		if(outchan!=null){
+			outchan.println(message);
+			outchan.flush();
+			if(outchan.checkError()){
+				System.out.println("(sendToJoueur) "+pseudo+" est parti...");
+				throw new IOException();
+			}
+		}
+	}
+
+	public String getPseudo() {
+		return pseudo;
+	}
+
+	public void setPseudo(String pseudo) {
+		this.pseudo = pseudo;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public void setSocket(Socket socket) {
+		this.socket = socket;
+	}
+
+	public PrintWriter getOutchan() {
+		return outchan;
+	}
+
+	public void setOutchan(PrintWriter outchan) {
+		this.outchan = outchan;
+	}
+
+	public BufferedReader getInchan() {
+		return inchan;
+	}
+
+	public void setInchan(BufferedReader inchan) {
+		this.inchan = inchan;
+	}
+
+	public Serveur getServeur() {
+		return serveur;
+	}
+
+	public void setServeur(Serveur serveur) {
+		this.serveur = serveur;
+	}
+
+	public boolean getEstConnecte() {
+		return estConnecte;
+	}
+
+	public void setEstConnecte(boolean isHere) {
+		this.estConnecte = isHere;
+	}
+
+	public boolean getEnAttente() {
+		return enAttente;
+	}
+
+	public void setEnAttente(boolean isWaiting) {
+		this.enAttente = isWaiting;
+	}
+
+
+}
