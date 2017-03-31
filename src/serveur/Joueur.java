@@ -55,6 +55,7 @@ public class Joueur extends Thread {
 			}
 
 			this.socket=s;
+			this.estConnecte=true;
 			try{
 				while(estConnecte){
 					informationFromJoueur();

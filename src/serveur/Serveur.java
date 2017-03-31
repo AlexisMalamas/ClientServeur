@@ -17,7 +17,7 @@ public class Serveur {
 	private Vector<Socket> sockets;
 	private  Socket	joueur;
 	public final static int port=2017;
-	public final static int capacite=1;
+	public final static int capacite=2;
 
 	private int nbwait;
 
