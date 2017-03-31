@@ -121,23 +121,24 @@ public class Joueur extends Thread {
 		}else
 			System.out.println("L'information re�ue ne correspond pas � notre protocole");
 
-	}
 
-	synchronized public void sendToJoueur(String message) throws IOException{
-		if(outchan!=null){
-			outchan.println(message);
-			outchan.flush();
-			if(outchan.checkError()){
-				System.out.println("(sendToJoueur) "+pseudo+" est parti...");
-				throw new IOException();
+		}
+
+		public void sendToJoueur(String message) throws IOException{
+			if(outchan!=null){
+				outchan.println(message);
+				outchan.flush();
+				if(outchan.checkError()){
+					System.out.println("(sendToJoueur) "+pseudo+" est parti...");
+					throw new IOException();
+				}
 			}
 		}
-	}
 
 	public String getPseudo() {
-		return pseudo;
-	}
-
+			return pseudo;
+		}	
+		
 	public void setPseudo(String pseudo) {
 		this.pseudo = pseudo;
 	}

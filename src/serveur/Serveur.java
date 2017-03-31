@@ -86,12 +86,24 @@ public class Serveur {
 			session.start();
 		}
 
-		try {
-			j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,j.getPseudo())); //A modif j.getPseudo par les vraies arguments placement/tirage/scores
+		else
+		{
+			this.joueurs.add(j); // on ajoute notre joueur connecté
+			
+			if(this.joueurs.size()==1)
+			{
+				this.session = new Session(this);
+				session.start();
+			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+			try {
+				j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,j.getPseudo())); //A modif j.getPseudo par les vraies arguments placement/tirage/scores
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		} 
 
 		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
 		nbwait--;
