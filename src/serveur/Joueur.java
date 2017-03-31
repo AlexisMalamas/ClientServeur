@@ -121,7 +121,7 @@ public class Joueur extends Thread {
 		}else if(Protocole.TROUVE.name().equals(cmd)){
 			// ï¿½ complï¿½ter plus tard
 		}else
-			System.out.println("L'information reï¿½ue ne correspond pas ï¿½ notre protocole");
+			System.out.println("L'information reçue ne correspond pas à notre protocole");
 
 
 		}
@@ -132,7 +132,6 @@ public class Joueur extends Thread {
 				outchan.flush();
 				if(outchan.checkError()){
 					System.out.println("(sendToJoueur) "+pseudo+" est parti...");
-					System.exit(1);
 				}
 			}
 		}

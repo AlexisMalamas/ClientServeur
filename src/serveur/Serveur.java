@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import game.Game;
 import protocole.*;
 
 public class Serveur {
@@ -20,13 +21,12 @@ public class Serveur {
 	public final static int capacite=2;
 
 	private int nbwait;
-
+	private int nbConnected;
 	private Session session;
 
 	public Serveur(){
 		this.joueurs = new ArrayList<Joueur>(capacite);
 		this.sockets = new Vector<Socket>();
-
 		for (int i = 0; i < capacite; i++)
 		{
 			Joueur j = new Joueur(this);
@@ -34,6 +34,7 @@ public class Serveur {
 			j.start();
 		}
 		this.nbwait=0;
+		this.nbConnected=0;
 	}
 
 
@@ -47,7 +48,7 @@ public class Serveur {
 				joueur = serverSocket.accept();
 				synchronized (this)
 				{
-					 
+
 					sockets.add(joueur);
 					this.nbwait++;
 					this.notify();
@@ -80,30 +81,21 @@ public class Serveur {
 	}
 
 	public void addJoueur(Joueur j){
-		if(this.joueurs.size()==0)
-		{
+		this.nbConnected++;
+		if(nbConnected==1){
 			this.session = new Session(this);
 			session.start();
 		}
-
-		else
-		{
-			this.joueurs.add(j); // on ajoute notre joueur connecté
+		try {
 			
-			if(this.joueurs.size()==1)
-			{
-				this.session = new Session(this);
-				session.start();
-			}
-
-		
-			try {
-				j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,j.getPseudo())); //A modif j.getPseudo par les vraies arguments placement/tirage/scores
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		} 
+			System.out.println("chrono :"+this.session.chrono());
+			System.out.println("plateau :"+this.session.getPlateau());
+			
+			j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,this.session.getPlateau(),this.session.getTirageCourant()
+					,this.session.scoreAllJoueur(),this.session.stringCurrentPhase(),String.valueOf(this.session.chrono())));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
 		nbwait--;
@@ -123,6 +115,7 @@ public class Serveur {
 
 	public void removeJoueur(Joueur j){
 		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.DECONNEXION,j.getPseudo()), j.getPseudo());
+		this.nbConnected--;
 	}
 
 	public void sendToAllJoueurButMe(String message, String joueurCourant){
@@ -137,10 +130,10 @@ public class Serveur {
 
 	}
 
-	public void sendToAllJoueur(String message, String joueurCourant){
+	public void sendToAllJoueur(String message){
 		for(Joueur j:this.joueurs){
 			try {
-				if(!j.getPseudo().equals(joueurCourant))
+				if(j.getPseudo()!=null)
 					j.sendToJoueur(message);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -152,6 +145,14 @@ public class Serveur {
 	public int nbPlayer()
 	{
 		return joueurs.size();
+	}
+
+	public ArrayList<Joueur> getJoueurs() {
+		return joueurs;
+	}
+
+	public void setJoueurs(ArrayList<Joueur> joueurs) {
+		this.joueurs = joueurs;
 	}
 
 }

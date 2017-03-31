@@ -11,7 +11,11 @@ public class Game {
 
 	private char[][] plateau;
 	private static int taille = 15;
+	private char[] tirageCourant;
 	private int nombreLettreDisponible;
+	private int scoreMax;
+	private String meilleurMot;
+	private String meilleurJoueur;
 
 	/*position 0 : A donc position 0 : A a pour score 1 etc...
 	 * Pas de Joker
@@ -21,18 +25,21 @@ public class Game {
 
 	public Game(){
 		this.plateau = new char[15][15];
-		nombreLettreDisponible=100;
+		this.nombreLettreDisponible=100;
+		this.scoreMax=0;
+		this.meilleurMot="";
+		this.meilleurJoueur="";
 		for(int i=0;i<taille;i++)
 			for(int j=0; j<taille;j++)
 				this.plateau[i][j]='0';
 	}
 
-	public String plateauToString(){
-		String plateauString=null;
+	public String plateauToString(char[][] plateau){
+		String plateauString="";
 
 		for(int i=0;i<taille;i++)
 			for(int j=0;j<taille;j++)
-				plateauString+=this.plateau[i][j];
+				plateauString+=plateau[i][j];
 
 		return plateauString;		
 	}
@@ -72,7 +79,7 @@ public class Game {
 			nombreLettres=this.nombreLettreDisponible;
 		}
 
-		char[] lettresTires= new char[nombreLettres];
+		this.tirageCourant= new char[nombreLettres];
 		int lettre;
 
 		for(int i=0; i<nombreLettres;i++){
@@ -81,11 +88,11 @@ public class Game {
 				lettre=ThreadLocalRandom.current().nextInt(65, 90 + 1);
 			}while(this.alphabetNombre[lettre-65]==0);
 
-			lettresTires[i]=(char)lettre;
+			this.tirageCourant[i]=(char)lettre;
 			this.alphabetNombre[lettre-65]--;
 		}
 
-		return lettresTires;
+		return this.tirageCourant;
 	}
 
 
@@ -218,5 +225,47 @@ public class Game {
 		}
 		return word;
 	}
+	
+	public int getScoreMax() {
+		return scoreMax;
+	}
+
+	public void setScoreMax(int scoreMax) {
+		this.scoreMax = scoreMax;
+	}
+
+	public String getMeilleurMot() {
+		return meilleurMot;
+	}
+
+	public void setMeilleurMot(String meilleurMot) {
+		this.meilleurMot = meilleurMot;
+	}
+
+	public String getMeilleurJoueur() {
+		return meilleurJoueur;
+	}
+
+	public void setMeilleurJoueur(String meilleurJoueur) {
+		this.meilleurJoueur = meilleurJoueur;
+	}
+	
+	public char[][] getPlateau() {
+		return plateau;
+	}
+
+	public void setPlateau(char[][] plateau) {
+		this.plateau = plateau;
+	}
+	
+	public char[] getTirageCourant() {
+		return tirageCourant;
+	}
+
+	public void setTirageCourant(char[] tirageCourant) {
+		this.tirageCourant = tirageCourant;
+	}
+
+	
 	
 }
