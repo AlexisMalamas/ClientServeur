@@ -70,6 +70,7 @@ public class Joueur extends Thread {
 				}
 				try {
 					socket.close();
+					
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -88,7 +89,7 @@ public class Joueur extends Thread {
 			if(message==null) message = "";
 		}
 
-		System.out.println("(SERVER) informationFromJoueur reï¿½oit : "+message);
+		System.out.println("(SERVER) informationFromJoueur reçoit : "+message);
 
 		String[] infoMessages = message.split("/");
 		String cmd = infoMessages[0];
@@ -131,7 +132,7 @@ public class Joueur extends Thread {
 				outchan.flush();
 				if(outchan.checkError()){
 					System.out.println("(sendToJoueur) "+pseudo+" est parti...");
-					throw new IOException();
+					System.exit(1);
 				}
 			}
 		}
