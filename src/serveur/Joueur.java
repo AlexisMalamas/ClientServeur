@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import protocole.Protocole;
 
@@ -58,10 +59,79 @@ public class Joueur extends Thread {
 			this.estConnecte=true;
 			try{
 				while(estConnecte){
-					informationFromJoueur();
+					String message = "";
+					
+					while(message=="" || !message.contains("/")){
+						try {
+							message = inchan.readLine();
+						} catch (IOException e) {
+							System.err.println("Un joueur s'est déconnecté anormalement");
+							break;
+						}
+						
+						if(message==null) message = "";
+					}
+					
+					if(message==null || message=="")
+						break;
+
+					System.out.println("(SERVER) informationFromJoueur reçoit : "+message);
+
+					String[] infoMessages = message.split("/");
+					String cmd = infoMessages[0];
+
+					if (Protocole.CONNEXION.name().equals(cmd)) {
+						try{
+
+							if(serveur.pseudoAlreadyUsed(infoMessages[1])){
+
+								this.pseudo = infoMessages[1];
+								this.serveur.envoiRefus(this);
+								this.pseudo=null;
+							}else{
+
+								this.pseudo = infoMessages[1];
+								System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
+								synchronized (serveur){this.serveur.addJoueur(this);}
+							}
+							
+						}catch (Exception e) {
+							System.err.println("Erreur : CONNEXION.");
+							System.out.println(e);
+						}
+					}else if(Protocole.SORT.name().equals(cmd)){
+						if(this.pseudo.equals(infoMessages[1])){
+							this.estConnecte = false;
+							synchronized(this.serveur)
+							{
+								this.serveur.removeJoueur(this);
+							}
+							System.out.println("DÃ©onnexion de " + this.pseudo);
+
+						}
+
+					}else if(Protocole.TROUVE.name().equals(cmd)){
+						
+						// 2 parties réflexion et soumission
+						Session session = this.serveur.getSession();
+						String placement = message.split("/")[1];
+						
+						// Phase de Recherche
+						
+						if(session.getCurrentPhase()==1){
+							
+						}
+						//Phase Soumission
+						else if(session.getCurrentPhase()==2){
+							
+						}else
+							System.out.println("La phase de soumission et recherche n'est pas disponible");
+						
+						
+					}
 				}
 				this.serveur.removeJoueur(this);
-
+				//this.socket.close();
 			}catch (Exception e) {
 				System.out.println("(Joueur run) Exception : "+e.toString());
 				synchronized(this.serveur)
@@ -76,60 +146,6 @@ public class Joueur extends Thread {
 				}
 			}
 		}
-	}
-
-	public void informationFromJoueur(){
-		String message = "";
-		while(message.isEmpty() || !message.contains("/")){
-			try {
-				message = inchan.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			if(message==null) message = "";
-		}
-
-		System.out.println("(SERVER) informationFromJoueur reçoit : "+message);
-
-		String[] infoMessages = message.split("/");
-		String cmd = infoMessages[0];
-
-		if (Protocole.CONNEXION.name().equals(cmd)) {
-			try{
-
-				if(serveur.pseudoAlreadyUsed(infoMessages[1])){
-
-					this.pseudo = infoMessages[1];
-					this.serveur.envoiRefus(this);
-					this.pseudo=null;
-				}else{
-
-					this.pseudo = infoMessages[1];
-					System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
-					synchronized (serveur){this.serveur.addJoueur(this);}
-				}
-				
-			}catch (Exception e) {
-				System.err.println("Erreur : CONNEXION.");
-				System.out.println(e);
-			}
-		}else if(Protocole.SORT.name().equals(cmd)){
-			if(this.pseudo.equals(infoMessages[1])){
-				this.estConnecte = false;
-				synchronized(this.serveur)
-				{
-					this.serveur.removeJoueur(this);
-				}
-				System.out.println("DÃ©onnexion de " + this.pseudo);
-
-			}
-
-		}else if(Protocole.TROUVE.name().equals(cmd)){
-			// ï¿½ complï¿½ter plus tard
-		}else
-			System.out.println("L'information reçue ne correspond pas à notre protocole");
-
-
 	}
 
 	public void sendToJoueur(String message) throws IOException{
