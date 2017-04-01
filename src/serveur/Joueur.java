@@ -33,15 +33,15 @@ public class Joueur extends Thread {
 	public void run() {
 		Socket s = null;
 		while(true){
-			
-			
+
+
 			synchronized (this.serveur)
-		      {
+			{
 				//si personnne dans la file d'attente, on attend
 				if(this.serveur.getNbwait()==0)
-		          try { this.serveur.wait(); } catch(InterruptedException e) {e.printStackTrace();}
-		        s = this.serveur.removeFirstSocket();
-			  }
+					try { this.serveur.wait(); } catch(InterruptedException e) {e.printStackTrace();}
+				s = this.serveur.removeFirstSocket();
+			}
 
 			try {
 				inchan = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -70,7 +70,7 @@ public class Joueur extends Thread {
 				}
 				try {
 					socket.close();
-					
+
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -97,12 +97,18 @@ public class Joueur extends Thread {
 		if (Protocole.CONNEXION.name().equals(cmd)) {
 			try{
 
-				//if(serveur.pseudoAlreadyUsed(infoMessages[1]))
-				//serveur.envoiRefus(infoMessages[1]);
+				if(serveur.pseudoAlreadyUsed(infoMessages[1])){
 
-				this.pseudo = infoMessages[1];
-				System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
-				synchronized (serveur){this.serveur.addJoueur(this);}
+					this.pseudo = infoMessages[1];
+					this.serveur.envoiRefus(this);
+					this.pseudo=null;
+				}else{
+
+					this.pseudo = infoMessages[1];
+					System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
+					synchronized (serveur){this.serveur.addJoueur(this);}
+				}
+				
 			}catch (Exception e) {
 				System.err.println("Erreur : CONNEXION.");
 				System.out.println(e);
@@ -115,7 +121,7 @@ public class Joueur extends Thread {
 					this.serveur.removeJoueur(this);
 				}
 				System.out.println("DÃ©onnexion de " + this.pseudo);
-				
+
 			}
 
 		}else if(Protocole.TROUVE.name().equals(cmd)){
@@ -124,22 +130,22 @@ public class Joueur extends Thread {
 			System.out.println("L'information reçue ne correspond pas à notre protocole");
 
 
-		}
+	}
 
-		public void sendToJoueur(String message) throws IOException{
-			if(outchan!=null){
-				outchan.println(message);
-				outchan.flush();
-				if(outchan.checkError()){
-					System.out.println("(sendToJoueur) "+pseudo+" est parti...");
-				}
+	public void sendToJoueur(String message) throws IOException{
+		if(outchan!=null){
+			outchan.println(message);
+			outchan.flush();
+			if(outchan.checkError()){
+				System.out.println("(sendToJoueur) "+pseudo+" est parti...");
 			}
 		}
+	}
 
 	public String getPseudo() {
-			return pseudo;
-		}	
-		
+		return pseudo;
+	}	
+
 	public void setPseudo(String pseudo) {
 		this.pseudo = pseudo;
 	}

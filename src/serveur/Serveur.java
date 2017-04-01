@@ -80,32 +80,34 @@ public class Serveur {
 
 	}
 
+	public void bienvenue(Joueur j){
+		try {
+			j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,this.session.getPlateau(),this.session.getTirageCourant()
+					,this.session.scoreAllJoueur(),this.session.stringCurrentPhase(),String.valueOf(this.session.chrono())));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void connecte(Joueur j){
+		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
+	}
+
 	public void addJoueur(Joueur j){
 		this.nbConnected++;
 		if(nbConnected==1){
 			this.session = new Session(this);
 			session.start();
 		}
-		try {
-			
-			System.out.println("chrono :"+this.session.chrono());
-			System.out.println("plateau :"+this.session.getPlateau());
-			
-			j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,this.session.getPlateau(),this.session.getTirageCourant()
-					,this.session.scoreAllJoueur(),this.session.stringCurrentPhase(),String.valueOf(this.session.chrono())));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
-		nbwait--;
+		bienvenue(j);
+		connecte(j);
+		this.nbwait--;
 	}
 
 	public  boolean pseudoAlreadyUsed(String pseudo)
 	{
 		for(Joueur j : joueurs){
-			if(j.getPseudo().equals(pseudo)){
-				System.out.println("Pseudo :"+pseudo+", j.get :"+j.getPseudo());
+			if(j.getPseudo()!=null && j.getPseudo().equals(pseudo)){
 				return true;
 			}
 		}

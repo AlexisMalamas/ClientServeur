@@ -42,7 +42,8 @@ public class Session extends Thread{
 			//researchPhase();
 			//submissionPhase();
 			//resultPhase();
-			
+			//resultPhase();
+			//bilan();
 		}
 		
 		publishResultOnTheWeb();
@@ -66,10 +67,13 @@ public class Session extends Thread{
 	public void resultPhase()
 	{
 		this.currentPhase = PHASE_RESULTAT;
+		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.BILAN,this.game.getMeilleurMot(),this.game.getMeilleurJoueur(),this.scoreAllJoueur()));
 		
-		String scoresAllJoueurs = scoreAllJoueur();
+	}
+	
+	public void bilan(){
+		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.VAINQUEUR,this.scoreAllJoueur()));
 		
-		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.BILAN,this.game.getMeilleurMot(),this.game.getMeilleurJoueur(),scoresAllJoueurs));
 	}
 	
 	public String scoreAllJoueur() {
