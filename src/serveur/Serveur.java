@@ -23,7 +23,7 @@ public class Serveur {
 	private int nbwait;
 	private int nbConnected;
 	private Session session;
-
+	
 	public Serveur(){
 		this.joueurs = new ArrayList<Joueur>(capacite);
 		this.sockets = new Vector<Socket>();
@@ -157,4 +157,13 @@ public class Serveur {
 		this.joueurs = joueurs;
 	}
 
+
+	public Session getSession() {
+		return session;
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
+	}
+	
 }
