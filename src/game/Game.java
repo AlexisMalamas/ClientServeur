@@ -16,6 +16,8 @@ public class Game {
 	private int scoreMax;
 	private String meilleurMot;
 	private String meilleurJoueur;
+	private char[][] meilleurPlateau;
+	private int nombreLettreATires;
 
 	/*position 0 : A donc position 0 : A a pour score 1 etc...
 	 * Pas de Joker
@@ -29,6 +31,7 @@ public class Game {
 		this.scoreMax=0;
 		this.meilleurMot="";
 		this.meilleurJoueur="";
+		this.nombreLettreATires=7;
 		for(int i=0;i<taille;i++)
 			for(int j=0; j<taille;j++)
 				this.plateau[i][j]='0';
@@ -71,6 +74,30 @@ public class Game {
 		}
 
 		return score;
+	}
+	
+	public void majMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
+		
+		if(score>this.scoreMax){
+			this.scoreMax=score;
+			
+			this.meilleurMot="";
+			for(String r : reponses){
+				if(reponses.size()==1)
+					this.meilleurMot+=r;
+				else
+					this.meilleurMot+=r;
+			}
+			this.meilleurPlateau=proposition;
+			this.nombreLettreATires = this.nombreLettreAUtiliser(proposition);
+		}
+	}
+	
+	public void majTourDeJeu(){
+		this.scoreMax=0;
+		this.meilleurJoueur="";
+		this.meilleurMot="";
+		this.plateau=this.meilleurPlateau;
 	}
 
 	public char[] tirage(int nombreLettres){
@@ -226,6 +253,17 @@ public class Game {
 		return word;
 	}
 	
+	public int nombreLettreAUtiliser(char[][] proposition){
+		int nombre =0;
+		
+		for(int i=0;i<taille;i++)
+			for(int j=0;j<taille;j++)
+				if(this.plateau[i][j]!=proposition[i][j])
+					nombre++;
+		return nombre;
+					
+	}
+	
 	public int getScoreMax() {
 		return scoreMax;
 	}
@@ -266,6 +304,20 @@ public class Game {
 		this.tirageCourant = tirageCourant;
 	}
 
+	public char[][] getMeilleurPlateau() {
+		return meilleurPlateau;
+	}
+
+	public void setMeilleurPlateau(char[][] meilleurPlateau) {
+		this.meilleurPlateau = meilleurPlateau;
+	}
 	
-	
+
+	public int getNombreLettreATires() {
+		return nombreLettreATires;
+	}
+
+	public void setNombreLettreATires(int nombreLettreATires) {
+		this.nombreLettreATires = nombreLettreATires;
+	}
 }

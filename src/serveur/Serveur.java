@@ -12,11 +12,10 @@ import protocole.*;
 
 public class Serveur {
 
-
 	private ServerSocket serverSocket;
-	private  ArrayList<Joueur> joueurs;
+	private ArrayList<Joueur> joueurs;
 	private Vector<Socket> sockets;
-	private  Socket	joueur;
+	private Socket	joueur;
 	public final static int port=2017;
 	public final static int capacite=2;
 
@@ -143,7 +142,12 @@ public class Serveur {
 		}
 
 	}
-
+	
+	public void arreterRecherche() {
+		synchronized (this) {
+			this.notify();
+		}
+	}
 	public int nbPlayer()
 	{
 		return joueurs.size();
@@ -165,5 +169,5 @@ public class Serveur {
 	public void setSession(Session session) {
 		this.session = session;
 	}
-	
+
 }

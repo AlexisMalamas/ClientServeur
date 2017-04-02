@@ -22,6 +22,7 @@ public class Joueur extends Thread {
 
 	private boolean estConnecte; 
 	private boolean enAttente;
+	private boolean normalDeco=false;
 
 	public Joueur(Serveur serveur){
 		this.serveur=serveur;
@@ -35,7 +36,7 @@ public class Joueur extends Thread {
 		Socket s = null;
 		while(true){
 
-
+			this.normalDeco=false;
 			synchronized (this.serveur)
 			{
 				//si personnne dans la file d'attente, on attend
@@ -66,6 +67,7 @@ public class Joueur extends Thread {
 							message = inchan.readLine();
 						} catch (IOException e) {
 							System.err.println("Un joueur s'est déconnecté anormalement");
+							this.estConnecte=false;
 							break;
 						}
 						
@@ -101,12 +103,14 @@ public class Joueur extends Thread {
 						}
 					}else if(Protocole.SORT.name().equals(cmd)){
 						if(this.pseudo.equals(infoMessages[1])){
-							this.estConnecte = false;
+							this.estConnecte=false;
+							this.normalDeco=true;
 							synchronized(this.serveur)
 							{
 								this.serveur.removeJoueur(this);
 							}
-							System.out.println("DÃ©onnexion de " + this.pseudo);
+							
+							System.out.println("Deonnexion de " + this.pseudo);
 
 						}
 
@@ -120,6 +124,8 @@ public class Joueur extends Thread {
 						
 						if(session.getCurrentPhase()==1){
 							
+								this.serveur.arreterRecherche();
+
 						}
 						//Phase Soumission
 						else if(session.getCurrentPhase()==2){
@@ -130,14 +136,12 @@ public class Joueur extends Thread {
 						
 					}
 				}
-				this.serveur.removeJoueur(this);
-				//this.socket.close();
+				if(!normalDeco)
+					this.serveur.removeJoueur(this);
+				this.socket.close();
 			}catch (Exception e) {
 				System.out.println("(Joueur run) Exception : "+e.toString());
-				synchronized(this.serveur)
-				{
-					this.serveur.removeJoueur(this);
-				}
+				
 				try {
 					socket.close();
 
