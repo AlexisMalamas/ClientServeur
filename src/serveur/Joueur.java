@@ -130,11 +130,10 @@ public class Joueur extends Thread {
 
 							if(reponses == null){
 								this.sendToJoueur(ProtocoleCreateur.create(Protocole.RINVALIDE, "mot invalide"));
-								this.serveur.getSession().setEndRecherche(true);
 							}else{
 								this.serveur.propositionRechercheValide(this);
 								this.scoreTour=this.serveur.getSession().getCalculScore(reponses);
-								this.serveur.getSession().getMajMeilleurScorePlateauMot(this.scoreTour, reponses, proposition);
+								this.serveur.getSession().getMajMeilleurScorePlateauMot(this.scoreTour, reponses, proposition, this.pseudo);
 								
 								this.sendToJoueur(ProtocoleCreateur.create(Protocole.MEILLEUR,"1"));
 								
@@ -150,12 +149,11 @@ public class Joueur extends Thread {
 							ArrayList<String> reponses = this.serveur.getSession().getWords(proposition);
 							if(reponses == null){
 								this.sendToJoueur(ProtocoleCreateur.create(Protocole.SINVALIDE, "mot invalide"));
-								this.serveur.getSession().setEndRecherche(true);
 							}else{
 								if(this.scoreTour<=this.serveur.getSession().getCalculScore(reponses)){
 									this.scoreTour=this.serveur.getSession().getCalculScore(reponses);
 									
-									if(this.serveur.getSession().getMajMeilleurScorePlateauMot(this.scoreTour, reponses, proposition))
+									if(this.serveur.getSession().getMajMeilleurScorePlateauMot(this.scoreTour, reponses, proposition, this.pseudo))
 									{
 										this.serveur.sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.MEILLEUR, "0"), this.getPseudo());
 
@@ -216,6 +214,14 @@ public class Joueur extends Thread {
 
 	public void setScore(int score) {
 		this.score = score;
+	}
+	
+	public int getScoreTour() {
+		return scoreTour;
+	}
+
+	public void setScoreTour(int scoreTour) {
+		this.scoreTour = scoreTour;
 	}
 
 	public Socket getSocket() {

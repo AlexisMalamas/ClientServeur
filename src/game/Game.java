@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,7 +20,6 @@ public class Game {
 	private String meilleurMot;
 	private String meilleurJoueur;
 	private char[][] meilleurPlateau;
-	private int nombreLettreATires;
 
 	/*position 0 : A donc position 0 : A a pour score 1 etc...
 	 * Pas de Joker
@@ -32,10 +33,17 @@ public class Game {
 		this.scoreMax=0;
 		this.meilleurMot="";
 		this.meilleurJoueur="";
-		this.nombreLettreATires=7;
 		for(int i=0;i<taille;i++)
 			for(int j=0; j<taille;j++)
 				this.plateau[i][j]='0';
+	}
+	
+	public int nbLettresRestantes()
+	{
+		int compteur = 0;
+		for(int i = 0; i < alphabetNombre.length; i++)
+			compteur+=alphabetNombre[i];
+		return compteur;
 	}
 
 	public String plateauToString(char[][] plateau){
@@ -78,11 +86,11 @@ public class Game {
 		return score;
 	}
 	
-	public boolean majMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
+	public boolean majMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition, String pseudo){
 		
 		if(score>this.scoreMax){
 			this.scoreMax=score;
-			
+			this.meilleurJoueur = pseudo;
 			this.meilleurMot="";
 			for(String r : reponses){
 				if(reponses.size()==1)
@@ -91,7 +99,6 @@ public class Game {
 					this.meilleurMot+=r;
 			}
 			this.meilleurPlateau=proposition;
-			this.nombreLettreATires = this.nombreLettreAUtiliser(proposition);
 			return true;
 		}
 		return false;
@@ -134,9 +141,21 @@ public class Game {
 	public boolean motsValide(ArrayList<String> mots){
 		int compt=0;
 		try{
-			InputStream flux=new FileInputStream("dictionnaire/dictionnaire.txt"); 
-			InputStreamReader lecture=new InputStreamReader(flux);
-			BufferedReader buff=new BufferedReader(lecture);
+			BufferedReader buff;
+			
+			try{
+				URL url = new URL("http://www.pallier.org/ressources/dicofr/liste.de.mots.francais.frgut.txt");
+				buff=new BufferedReader(new InputStreamReader(url.openStream()));
+			}
+			catch(MalformedURLException e)
+			{
+				System.out.println(e);
+				InputStream flux=new FileInputStream("dictionnaire/dictionnaire.txt");
+				InputStreamReader lecture=new InputStreamReader(flux);
+				buff=new BufferedReader(lecture);
+				
+			}
+			
 			String ligne;
 			
 			
@@ -275,17 +294,6 @@ public class Game {
 		return word;
 	}
 	
-	public int nombreLettreAUtiliser(char[][] proposition){
-		int nombre =0;
-		
-		for(int i=0;i<taille;i++)
-			for(int j=0;j<taille;j++)
-				if(this.plateau[i][j]!=proposition[i][j])
-					nombre++;
-		return nombre;
-					
-	}
-	
 	public int getScoreMax() {
 		return scoreMax;
 	}
@@ -332,14 +340,5 @@ public class Game {
 
 	public void setMeilleurPlateau(char[][] meilleurPlateau) {
 		this.meilleurPlateau = meilleurPlateau;
-	}
-	
-
-	public int getNombreLettreATires() {
-		return nombreLettreATires;
-	}
-
-	public void setNombreLettreATires(int nombreLettreATires) {
-		this.nombreLettreATires = nombreLettreATires;
 	}
 }
