@@ -78,7 +78,7 @@ public class Game {
 		return score;
 	}
 	
-	public void majMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
+	public boolean majMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
 		
 		if(score>this.scoreMax){
 			this.scoreMax=score;
@@ -92,7 +92,9 @@ public class Game {
 			}
 			this.meilleurPlateau=proposition;
 			this.nombreLettreATires = this.nombreLettreAUtiliser(proposition);
+			return true;
 		}
+		return false;
 	}
 	
 	public void majTourDeJeu(){

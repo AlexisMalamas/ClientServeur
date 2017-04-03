@@ -45,7 +45,8 @@ public class Session extends Thread{
 		{
 			switch(currentPhase){
 			case PHASE_SESSION:
-				//this.temps(CHRONO_SESSION);
+				this.chronometre = CHRONO_SESSION;
+				this.temps(CHRONO_SESSION);
 				this.currentPhase = PHASE_RECHERCHE;
 				break;
 
@@ -59,11 +60,14 @@ public class Session extends Thread{
 					this.game.majTourDeJeu();
 					this.currentPhase=PHASE_RECHERCHE;
 				}else
+				{
 					this.currentPhase = PHASE_SOUMISSION;
+					this.endRecherche = false;
+				}
 				break;
 
 			case PHASE_SOUMISSION:
-
+				
 				try {
 					Thread.sleep(CHRONO_SOUMISSION);
 				} catch (InterruptedException e) {
@@ -190,8 +194,8 @@ public class Session extends Thread{
 		return this.game.calculScore(reponses);
 	}
 	
-	public void getMajMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
-		this.game.majMeilleurScorePlateauMot(score, reponses, proposition);
+	public boolean getMajMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
+		return this.game.majMeilleurScorePlateauMot(score, reponses, proposition);
 	}
 	
 	public void temps(int temps){
@@ -207,10 +211,11 @@ public class Session extends Thread{
 					this.chronometre--;
 				}
 				lastTimeTimer = System.currentTimeMillis();
-
+				synchronized(this){
 				if(this.endRecherche==true){
 					System.out.println("break endrecherche");
 					break;
+				}
 				}
 				
 				if(this.chronometre ==0)

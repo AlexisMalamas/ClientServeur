@@ -15,6 +15,7 @@ public class Joueur extends Thread {
 
 	private String pseudo;
 	private int score;
+	private int scoreTour;
 
 	private Socket socket;
 	private PrintWriter outchan;
@@ -28,6 +29,7 @@ public class Joueur extends Thread {
 	public Joueur(Serveur serveur){
 		this.serveur=serveur;
 		this.score=0;
+		this.scoreTour=0;
 		this.estConnecte=true;
 
 	}
@@ -116,7 +118,7 @@ public class Joueur extends Thread {
 
 					}else if(Protocole.TROUVE.name().equals(cmd)){
 						
-						// 2 parties r�flexion et soumission
+						// 2 parties réflexion et soumission
 						Session session = this.serveur.getSession();
 						String placement = message.split("/")[1];
 						char[][] proposition = this.serveur.getSession().getStringtoPlateau(placement);
@@ -127,22 +129,44 @@ public class Joueur extends Thread {
 							ArrayList<String> reponses = this.serveur.getSession().getWords(proposition);
 
 							if(reponses == null){
-								this.sendToJoueur(ProtocoleCreateur.create(Protocole.RINVALIDE));
+								this.sendToJoueur(ProtocoleCreateur.create(Protocole.RINVALIDE, "mot invalide"));
 								this.serveur.getSession().setEndRecherche(true);
 							}else{
 								this.serveur.propositionRechercheValide(this);
-								this.score=this.serveur.getSession().getCalculScore(reponses);
-								this.serveur.getSession().getMajMeilleurScorePlateauMot(this.score, reponses, proposition);
+								this.scoreTour=this.serveur.getSession().getCalculScore(reponses);
+								this.serveur.getSession().getMajMeilleurScorePlateauMot(this.scoreTour, reponses, proposition);
 								
 								this.sendToJoueur(ProtocoleCreateur.create(Protocole.MEILLEUR,"1"));
 								
-								this.serveur.getSession().setEndRecherche(true);
+								synchronized(this.serveur.getSession()){
+									this.serveur.getSession().setEndRecherche(true);
+								}
 							}
 								
 
 						}
 						//Phase Soumission
 						else if(session.getCurrentPhase()==2){
+							ArrayList<String> reponses = this.serveur.getSession().getWords(proposition);
+							if(reponses == null){
+								this.sendToJoueur(ProtocoleCreateur.create(Protocole.SINVALIDE, "mot invalide"));
+								this.serveur.getSession().setEndRecherche(true);
+							}else{
+								if(this.scoreTour<=this.serveur.getSession().getCalculScore(reponses)){
+									this.scoreTour=this.serveur.getSession().getCalculScore(reponses);
+									
+									if(this.serveur.getSession().getMajMeilleurScorePlateauMot(this.scoreTour, reponses, proposition))
+									{
+										this.serveur.sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.MEILLEUR, "0"), this.getPseudo());
+
+										this.sendToJoueur(ProtocoleCreateur.create(Protocole.MEILLEUR,"1"));
+									}
+								}
+								
+
+								this.sendToJoueur(ProtocoleCreateur.create(Protocole.SVALIDE));
+								
+							}
 							
 						}else
 							System.out.println("La phase de soumission et recherche n'est pas disponible");

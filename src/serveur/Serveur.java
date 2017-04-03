@@ -127,7 +127,7 @@ public class Serveur {
 	public void propositionRechercheValide(Joueur j){
 		try {
 			j.sendToJoueur(ProtocoleCreateur.create(Protocole.RVALIDE));
-			sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.RVALIDE,j.getPseudo()), j.getPseudo());
+			sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.RATROUVE,j.getPseudo()), j.getPseudo());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
