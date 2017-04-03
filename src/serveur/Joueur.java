@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import protocole.Protocole;
+import protocole.ProtocoleCreateur;
 
 public class Joueur extends Thread {
 
@@ -119,12 +120,26 @@ public class Joueur extends Thread {
 						// 2 parties réflexion et soumission
 						Session session = this.serveur.getSession();
 						String placement = message.split("/")[1];
-						
+						char[][] proposition = this.serveur.getSession().getStringtoPlateau(placement);
+
 						// Phase de Recherche
 						
 						if(session.getCurrentPhase()==1){
-							
-								this.serveur.arreterRecherche();
+							ArrayList<String> reponses = this.serveur.getSession().getWords(proposition);
+
+							if(reponses == null){
+								this.sendToJoueur(ProtocoleCreateur.create(Protocole.RINVALIDE));
+								this.serveur.getSession().setEndRecherche(true);
+							}else{
+								this.serveur.propositionRechercheValide(this);
+								this.score=this.serveur.getSession().getCalculScore(reponses);
+								this.serveur.getSession().getMajMeilleurScorePlateauMot(this.score, reponses, proposition);
+								
+								this.sendToJoueur(ProtocoleCreateur.create(Protocole.MEILLEUR,"1"));
+								
+								this.serveur.getSession().setEndRecherche(true);
+							}
+								
 
 						}
 						//Phase Soumission

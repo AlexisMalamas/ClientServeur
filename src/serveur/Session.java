@@ -12,13 +12,14 @@ public class Session extends Thread{
 	private Serveur server;
 	private int currentPhase;
 	private int nombreTour;
-	private long chronometre;
+	private int chronometre;
+	private boolean endRecherche;
 
 	//Chrono en milliseconds
-	private final static int CHRONO_SESSION = 20*1000;
-	private final static int CHRONO_RECHERCHE= 300*1000; 
-	private final static int CHRONO_SOUMISSION= 120*1000;
-	private final static int CHRONO_RESULTAT= 10*1000;
+	private final static int CHRONO_SESSION = 20;
+	private final static int CHRONO_RECHERCHE= 300; 
+	private final static int CHRONO_SOUMISSION= 120;
+	private final static int CHRONO_RESULTAT= 10;
 
 	public final static int PHASE_SESSION = 0;
 	public final static int PHASE_RECHERCHE = 1;
@@ -32,42 +33,34 @@ public class Session extends Thread{
 		this.server = server;
 		this.nombreTour=1;
 		this.currentPhase=PHASE_SESSION;
-		this.chronometre=-1;
+		this.chronometre=0;
 	}
 
-	@Override
 	public void run() {
 
 		while(server.nbPlayer() != 0)// tant que des joueurs sont connectées
 		{
 			switch(currentPhase){
 			case PHASE_SESSION:
-				try {
-					this.chronometre= System.currentTimeMillis();
-					Thread.sleep(CHRONO_SESSION);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
+				//this.temps(CHRONO_SESSION);
 				this.currentPhase = PHASE_RECHERCHE;
 				break;
 
 			case PHASE_RECHERCHE:
 				this.tour();
-				this.chronometre= System.currentTimeMillis();
-				synchronized(this.server){
-					try {
-						System.out.println("DEBUT wait");
-						this.server.wait(CHRONO_RECHERCHE);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				this.rFin();
-				this.currentPhase = PHASE_SOUMISSION;
+				this.endRecherche=false;
+				this.temps(CHRONO_RECHERCHE);
+				
+				if(this.chronometre==0){
+					this.rFin();
+					this.game.majTourDeJeu();
+					this.currentPhase=PHASE_RECHERCHE;
+				}else
+					this.currentPhase = PHASE_SOUMISSION;
 				break;
 
 			case PHASE_SOUMISSION:
-				this.chronometre= System.currentTimeMillis();
+
 				try {
 					Thread.sleep(CHRONO_SOUMISSION);
 				} catch (InterruptedException e) {
@@ -80,8 +73,8 @@ public class Session extends Thread{
 
 			case PHASE_RESULTAT:
 				this.bilan();
-				this.chronometre= System.currentTimeMillis();
-				this.game.majTourDeJeu();
+
+				//this.game.majTourDeJeu();
 				try {
 					Thread.sleep(CHRONO_RESULTAT);
 				} catch (InterruptedException e) {
@@ -172,6 +165,14 @@ public class Session extends Thread{
 		return tirage;
 	}
 
+	public ArrayList<String> getWords(char[][] proposition){
+		return this.game.createdWords(proposition);
+	}
+	
+	public char[][] getStringtoPlateau(String plateauString){
+		return this.game.stringToPlateau(plateauString);
+	}
+	
 	public String stringCurrentPhase(){
 		if(this.currentPhase == PHASE_RECHERCHE)
 			return "REC";
@@ -180,6 +181,39 @@ public class Session extends Thread{
 		else if(this.currentPhase == PHASE_SOUMISSION)
 			return "SOU";
 		return "DEB";
+	}
+
+	public int getCalculScore(ArrayList<String> reponses){
+		return this.game.calculScore(reponses);
+	}
+	
+	public void getMajMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
+		this.game.majMeilleurScorePlateauMot(score, reponses, proposition);
+	}
+	
+	public void temps(int temps){
+		long actualTimer;
+		long lastTimeTimer = 0;
+		this.chronometre = temps;
+		
+		while(true){
+			actualTimer=System.currentTimeMillis();
+			if(actualTimer - lastTimeTimer > 1000) // toutes les 1 sec
+			{
+				if(this.chronometre>0){
+					this.chronometre--;
+				}
+				lastTimeTimer = System.currentTimeMillis();
+
+				if(this.endRecherche==true){
+					System.out.println("break endrecherche");
+					break;
+				}
+				
+				if(this.chronometre ==0)
+					break;
+			}
+		}
 	}
 
 	public void publishResultOnTheWeb()
@@ -204,30 +238,21 @@ public class Session extends Thread{
 		return this.game.plateauToString(this.game.getPlateau());
 	}
 
-	public long chrono(){
-		int time=0;
-
-		System.out.println("phase courante :"+this.currentPhase);
-
-		switch (this.currentPhase) {
-		case PHASE_SESSION:
-			time = CHRONO_SESSION;
-			break;
-		case PHASE_RECHERCHE:
-			time = CHRONO_RECHERCHE;
-			break;
-		case PHASE_SOUMISSION:
-			time = CHRONO_SOUMISSION;
-			break;
-		case PHASE_RESULTAT:
-			time = CHRONO_RESULTAT;
-			break;
-		case PAS_PHASE:
-			time=0;
-			break;
-		default:
-			break;
-		}
-		return (time-(this.chronometre-System.currentTimeMillis()))/1000;
+	public int getChronometre() {
+		return chronometre;
 	}
+
+	public void setChronometre(int chronometre) {
+		this.chronometre = chronometre;
+	}
+
+
+	public boolean isEndRecherche() {
+		return endRecherche;
+	}
+
+	public void setEndRecherche(boolean endRecherche) {
+		this.endRecherche = endRecherche;
+	}
+
 }

@@ -48,13 +48,14 @@ public class Game {
 	}
 
 	public char[][] stringToPlateau(String plateauString){
-		String [] chaine = plateauString.split("");
-
-		for(int i=0;i<15;i++){
-			System.arraycopy(chaine, (i*taille), this.plateau[i], 0, taille);
-		}
-
-		return this.plateau;
+		char[][] p = new char[this.taille][this.taille];
+		for(int i = 0; i < this.taille; i++){
+				for(int j = 0; j < this.taille; j++){
+					p[i][j] = plateauString.charAt(i * this.taille + j);
+				}
+			 }
+		
+		return p;
 	}
 
 	public int charToInt(char lettre){
@@ -97,7 +98,10 @@ public class Game {
 		this.scoreMax=0;
 		this.meilleurJoueur="";
 		this.meilleurMot="";
-		this.plateau=this.meilleurPlateau;
+		
+		if(this.meilleurPlateau!=null)
+			this.plateau=this.meilleurPlateau;
+		this.meilleurPlateau=null;
 	}
 
 	public char[] tirage(int nombreLettres){
@@ -130,6 +134,9 @@ public class Game {
 			InputStreamReader lecture=new InputStreamReader(flux);
 			BufferedReader buff=new BufferedReader(lecture);
 			String ligne;
+			
+			for(String r:mots)
+				System.out.println(r);
 
 			while ((ligne=buff.readLine())!=null){
 				for(String mot: mots){
@@ -170,8 +177,10 @@ public class Game {
 					posJ = j;
 				}
 		
-		if(posI ==-1 || posJ ==-1)
+		if(posI ==-1 || posJ ==-1){
+			System.out.println("ici pas bon");
 			return null;
+		}
 		
 		if(proposition[posI][posJ+1] != this.plateau[posI][posJ+1])
 			wordHorizontaly = true;
@@ -207,13 +216,15 @@ public class Game {
 		
 		if(motsValide(wordsCreated))
 			return wordsCreated;
-		else
+		else{
+			System.out.println("ici pas bon 2");
 			return null;
+		}
 	}
 	
 	public String getWordCreatedSameDirectionVerticaly( int posI, int posJ, char[][] proposition)
 	{
-		String word = null;
+		String word = "";
 		int j = posJ;
 		while(posJ>=0 && this.plateau[posI][posJ]!='0')
 		{
@@ -234,7 +245,7 @@ public class Game {
 	
 	public String getWordCreatedSameDirectionHorizontaly( int posI, int posJ, char[][] proposition)
 	{
-		String word = null;
+		String word = "";
 		int i = posI;
 		while(posI>=0 && this.plateau[posI][posJ]!='0')
 		{

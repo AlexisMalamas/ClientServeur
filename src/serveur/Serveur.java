@@ -18,7 +18,7 @@ public class Serveur {
 	private Socket	joueur;
 	public final static int port=2017;
 	public final static int capacite=2;
-
+	
 	private int nbwait;
 	private int nbConnected;
 	private Session session;
@@ -82,27 +82,41 @@ public class Serveur {
 	public void bienvenue(Joueur j){
 		try {
 			j.sendToJoueur(ProtocoleCreateur.create(Protocole.BIENVENUE,this.session.getPlateau(),this.session.getTirageCourant()
-					,this.session.scoreAllJoueur(),this.session.stringCurrentPhase(),String.valueOf(this.session.chrono())));
+					,this.session.scoreAllJoueur(),this.session.stringCurrentPhase(),String.valueOf(this.session.getChronometre())));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	
+	
 	public void connecte(Joueur j){
 		sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.CONNECTE,j.getPseudo()), j.getPseudo());
 	}
 
 	public void addJoueur(Joueur j){
 		this.nbConnected++;
+		
 		if(nbConnected==1){
 			this.session = new Session(this);
 			session.start();
 		}
 		bienvenue(j);
 		connecte(j);
+
 		this.nbwait--;
 	}
 
+	public void propositionRechercheValide(Joueur j){
+		try {
+			j.sendToJoueur(ProtocoleCreateur.create(Protocole.RVALIDE));
+			sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.RVALIDE,j.getPseudo()), j.getPseudo());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public  boolean pseudoAlreadyUsed(String pseudo)
 	{
 		for(Joueur j : joueurs){
@@ -142,12 +156,7 @@ public class Serveur {
 		}
 
 	}
-	
-	public void arreterRecherche() {
-		synchronized (this) {
-			this.notify();
-		}
-	}
+
 	public int nbPlayer()
 	{
 		return joueurs.size();

@@ -27,19 +27,16 @@ public class Client {
 				System.out.println("?");
 				ligne = console.readLine();
 				
-
 				if(ligne == ""){System.out.println("Connexion terminee");sock.close();break;}
-				System.out.println("envoie de "+ligne);
 				canalEcriture.println(ligne);
 				canalEcriture.flush();
 				ligne = inchan.readLine();
 
 				System.out.println(""+ligne);
-				
+
 				ligne = inchan.readLine();
 
 				System.out.println(""+ligne);
-				
 			}
 			
 		}
