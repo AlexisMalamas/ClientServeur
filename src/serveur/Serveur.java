@@ -1,11 +1,14 @@
 package serveur;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Vector;
+
 
 import game.Game;
 import protocole.*;
@@ -21,6 +24,7 @@ public class Serveur {
 	
 	private int nbwait;
 	private int nbConnected;
+	private int numeroSession;
 	private Session session;
 	
 	public Serveur(){
@@ -33,7 +37,16 @@ public class Serveur {
 			j.start();
 		}
 		this.nbwait=0;
+		this.numeroSession = 1;
 		this.nbConnected=0;
+		
+		ArrayList<String> nom = new ArrayList<String>();
+		ArrayList<Integer> scores = new ArrayList<Integer>();
+		nom.add("jean");
+		nom.add("bob");
+		scores.add(10);
+		scores.add(20);
+		saveResults(42,nom,scores);
 	}
 
 
@@ -156,7 +169,72 @@ public class Serveur {
 		}
 
 	}
+<<<<<<< HEAD
 
+=======
+	
+	public void arreterRecherche() {
+		synchronized (this) {
+			this.notify();
+		}
+	}
+	
+	public void saveResults(int nbTour, ArrayList<String> nom,  ArrayList<Integer> scores)
+	{
+		String myOutputString	= "";
+		
+		RandomAccessFile myInputFile = null;
+		String myLine = null;
+		
+		try{
+			// --- Open the file
+			myInputFile = new RandomAccessFile("resultats.html", "r");
+			
+			// --- Read line per line
+			while (  (myLine = myInputFile.readLine() ) != null){
+				if(myLine.equals("<h1>Resultats des sessions</h1>"))
+					myLine += "\n"+generateHtml(nbTour, nom, scores);
+				
+				myOutputString += myLine+"\n";
+			}
+			
+			File f = new File("resultats.html");
+			FileWriter ffw=new FileWriter(f);
+			
+			ffw.write(myOutputString);
+			ffw.close();
+
+			
+		}catch (IOException e){
+			System.err.println("IOException : "+e.getMessage());
+		}finally {
+			try{
+				myInputFile.close();
+			}catch ( Exception e ){
+
+			}
+		}
+	}
+	public String generateHtml(int nbTour, ArrayList<String> nom,  ArrayList<Integer> scores)
+	{
+		String s = "<div class=resultats>\n"
+				+"<h2>Session "+this.numeroSession+"</h2>\n"
+				+"<span>Nombre de Tour : "+nbTour+"</span>\n"
+				+"<table>\n"
+				+"<tr><th>Nom du joueur</th><th>score</th></tr>\n";
+		for(int i=0; i<nom.size(); i++)
+		{
+			s+="<tr><td>"+nom.get(i)+"</td><td>"+scores.get(i)+"</td></tr>\n";
+		}
+		
+		s+="</table>\n"
+			+"</div>\n";
+	
+		
+		return s;
+	}
+	
+>>>>>>> branch 'master' of https://github.com/AlexisMalamas/ClientServeur
 	public int nbPlayer()
 	{
 		return joueurs.size();

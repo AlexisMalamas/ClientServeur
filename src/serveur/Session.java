@@ -36,7 +36,36 @@ public class Session extends Thread{
 		this.chronometre=0;
 	}
 
+<<<<<<< HEAD
 	public void run() {
+=======
+	@Override
+	public void run() {
+		
+		/*temps = 300;
+		 * sessionNotEnd
+		 * int lastTimeTimer = 0;
+		 * while(sessionNotEnd)
+		 * {
+		 * 		actualTimeTimer = SDL_GetTicks();
+		 * 		if(actualTimeTimer - lastTimeTimer > 1000) // toutes les 1 sec
+		        {
+		            if(temps>0)
+		                temps--;
+		            lastTimeTimer = SDL_GetTicks();
+		            
+		            if(temps ==0)
+		            {
+		            	nextPhase();
+		            }
+		        }
+		 * 
+		 * }
+		 * 
+		 * 
+		 * 
+		 * */
+>>>>>>> branch 'master' of https://github.com/AlexisMalamas/ClientServeur
 
 		while(server.nbPlayer() != 0)// tant que des joueurs sont connectées
 		{
@@ -157,7 +186,7 @@ public class Session extends Thread{
 	}
 
 	public String getTirageCourant(){
-		String tirage = "";
+		String tirage = " ";
 
 		if(this.game.getTirageCourant()==null)
 			return tirage;
@@ -244,6 +273,7 @@ public class Session extends Thread{
 	public long getChronometre() {
 		return chronometre;
 	}
+<<<<<<< HEAD
 
 	public void setChronometre(int chronometre) {
 		this.chronometre = chronometre;
@@ -259,3 +289,6 @@ public class Session extends Thread{
 	}
 
 }
+=======
+}
+>>>>>>> branch 'master' of https://github.com/AlexisMalamas/ClientServeur

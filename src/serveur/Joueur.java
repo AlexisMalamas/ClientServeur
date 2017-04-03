@@ -67,7 +67,7 @@ public class Joueur extends Thread {
 						try {
 							message = inchan.readLine();
 						} catch (IOException e) {
-							System.err.println("Un joueur s'est déconnecté anormalement");
+							System.err.println("Un joueur s'est dÃ©connectÃ© anormalement");
 							this.estConnecte=false;
 							break;
 						}
@@ -77,8 +77,7 @@ public class Joueur extends Thread {
 					
 					if(message==null || message=="")
 						break;
-
-					System.out.println("(SERVER) informationFromJoueur reçoit : "+message);
+					System.out.println("(SERVER) informationFromJoueur reÃ§oit : "+message);
 
 					String[] infoMessages = message.split("/");
 					String cmd = infoMessages[0];
@@ -117,7 +116,7 @@ public class Joueur extends Thread {
 
 					}else if(Protocole.TROUVE.name().equals(cmd)){
 						
-						// 2 parties réflexion et soumission
+						// 2 parties rï¿½flexion et soumission
 						Session session = this.serveur.getSession();
 						String placement = message.split("/")[1];
 						char[][] proposition = this.serveur.getSession().getStringtoPlateau(placement);
@@ -169,6 +168,8 @@ public class Joueur extends Thread {
 
 	public void sendToJoueur(String message) throws IOException{
 		if(outchan!=null){
+			System.out.println("Envoi de "+message);
+
 			outchan.println(message);
 			outchan.flush();
 			if(outchan.checkError()){
