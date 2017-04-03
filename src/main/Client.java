@@ -36,10 +36,6 @@ public class Client {
 
 				System.out.println(""+ligne);
 				
-				ligne = inchan.readLine();
-
-				System.out.println(""+ligne);
-				
 			}
 			
 		}
