@@ -50,6 +50,7 @@ public class Session extends Thread{
 				break;
 
 			case PHASE_RECHERCHE:
+				this.tour();
 				this.endRecherche=false;
 				this.temps(CHRONO_RECHERCHE);
 				

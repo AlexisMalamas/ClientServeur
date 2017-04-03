@@ -40,6 +40,8 @@ public class Serveur {
 		this.numeroSession = 1;
 		this.nbConnected=0;
 		
+		//Partie HTML
+		/*
 		ArrayList<String> nom = new ArrayList<String>();
 		ArrayList<Integer> scores = new ArrayList<Integer>();
 		nom.add("jean");
@@ -47,6 +49,7 @@ public class Serveur {
 		scores.add(10);
 		scores.add(20);
 		saveResults(42,nom,scores);
+		*/
 	}
 
 

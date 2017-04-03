@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -129,27 +130,36 @@ public class Game {
 
 	//verif si les mots sont dans le dico
 	public boolean motsValide(ArrayList<String> mots){
+		int compt=0;
 		try{
 			InputStream flux=new FileInputStream("dictionnaire/dictionnaire.txt"); 
 			InputStreamReader lecture=new InputStreamReader(flux);
 			BufferedReader buff=new BufferedReader(lecture);
 			String ligne;
 			
+			
 			for(String r:mots)
 				System.out.println(r);
 
 			while ((ligne=buff.readLine())!=null){
 				for(String mot: mots){
-					if(!mot.equals(ligne))
-						return false;
+					ligne=Normalizer.normalize(ligne, Normalizer.Form.NFD);
+					ligne=ligne.toUpperCase();
+					if(mot.equals(ligne)){
+						compt++;
+					}
+					
 				}
 			}
 			buff.close(); 
 		}catch (Exception e){
 			System.out.println(e.toString());
 		}
-		
-		return true;
+		System.out.println(compt);
+		if(compt==mots.size())
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean plateauVide(){
@@ -178,7 +188,6 @@ public class Game {
 				}
 		
 		if(posI ==-1 || posJ ==-1){
-			System.out.println("ici pas bon");
 			return null;
 		}
 		
@@ -195,7 +204,7 @@ public class Game {
 			for(int i= posI; proposition[i][posJ] !='0'; i++){
 				String s = null;
 				s = getWordCreatedSameDirectionHorizontaly(i, posJ, proposition);
-				if(s!=null)
+				if(s!=null && s.length()>1)
 					wordsCreated.add(s);
 			}
 		}
@@ -207,7 +216,7 @@ public class Game {
 				
 				String s = null;
 				s = getWordCreatedSameDirectionVerticaly(posI, j, proposition);
-				if(s!=null)
+				if(s!=null && s.length()>1)
 					wordsCreated.add(s);
 			}
 		}
@@ -222,20 +231,20 @@ public class Game {
 		}
 	}
 	
-	public String getWordCreatedSameDirectionVerticaly( int posI, int posJ, char[][] proposition)
+	public String getWordCreatedSameDirectionHorizontaly( int posI, int posJ, char[][] proposition)
 	{
 		String word = "";
 		int j = posJ;
-		while(posJ>=0 && this.plateau[posI][posJ]!='0')
+		while(posJ>=0 && proposition[posI][posJ]!='0')
 		{
 			j=posJ;
 			posJ--;
 		}
 		
-		while(j<taille && this.plateau[posI][j]!='0' || proposition[posI][j] != '0')
+		while(j<taille && proposition[posI][j] != '0')
 		{
-			if(this.plateau[posI][j]!='0')
-				word+=this.plateau[posI][j];
+			if(proposition[posI][j]!='0')
+				word+=proposition[posI][j];
 			else
 				word+=proposition[posI][j];
 			j++;
@@ -243,20 +252,20 @@ public class Game {
 		return word;
 	}
 	
-	public String getWordCreatedSameDirectionHorizontaly( int posI, int posJ, char[][] proposition)
+	public String getWordCreatedSameDirectionVerticaly( int posI, int posJ, char[][] proposition)
 	{
 		String word = "";
 		int i = posI;
-		while(posI>=0 && this.plateau[posI][posJ]!='0')
+		while(posI>=0 && proposition[posI][posJ]!='0')
 		{
 			i=posI;
 			posI--;
 		}
 		
-		while(i<taille && this.plateau[i][posJ]!='0' || proposition[i][posJ] != '0')
+		while(i<taille && proposition[i][posJ] != '0')
 		{
-			if(this.plateau[i][posJ]!='0')
-				word+=this.plateau[i][posJ];
+			if(proposition[i][posJ]!='0')
+				word+=proposition[i][posJ];
 			else
 				word+=proposition[i][posJ];
 			i++;
