@@ -22,18 +22,12 @@ public enum Protocole {
 		RVALIDE,
 		RINVALIDE,
 		RATROUVE,
+		RFIN,
 		
 		// Phase de soumission
-		ENCHERE,
-		VALIDATION,
-		ECHEC,
-		NOUVELLEENCHERE,
-		FINENCHERE,
-		
-		// Phase de résolution
 		SVALIDE,
-		SINVALIDE,
-		FIN,
+		SFIN,
+
 		
 		//Phase de résultat
 		BILAN,
