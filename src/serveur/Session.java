@@ -82,9 +82,10 @@ public class Session extends Thread{
 					try {
 						System.out.println("DEBUT wait");
 						this.wait(CHRONO_RECHERCHE);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+						}
+						catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 				}
 				this.rFin();
 				this.currentPhase = PHASE_SOUMISSION;

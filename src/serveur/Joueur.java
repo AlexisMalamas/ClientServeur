@@ -76,7 +76,6 @@ public class Joueur extends Thread {
 					
 					if(message==null || message=="")
 						break;
-
 					System.out.println("(SERVER) informationFromJoueur reçoit : "+message);
 
 					String[] infoMessages = message.split("/");
@@ -116,7 +115,7 @@ public class Joueur extends Thread {
 
 					}else if(Protocole.TROUVE.name().equals(cmd)){
 						
-						// 2 parties réflexion et soumission
+						// 2 parties r�flexion et soumission
 						Session session = this.serveur.getSession();
 						String placement = message.split("/")[1];
 						
@@ -155,6 +154,7 @@ public class Joueur extends Thread {
 	public void sendToJoueur(String message) throws IOException{
 		if(outchan!=null){
 			System.out.println("Envoi de "+message);
+
 			outchan.println(message);
 			outchan.flush();
 			if(outchan.checkError()){
