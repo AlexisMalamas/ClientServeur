@@ -12,7 +12,7 @@ public class Session extends Thread{
 	private Serveur server;
 	private int currentPhase;
 	private int nombreTour;
-	private int chronometre;
+	private long chronometre;
 	private boolean endRecherche;
 
 	//Chrono en milliseconds
@@ -48,15 +48,18 @@ public class Session extends Thread{
 
 			case PHASE_RECHERCHE:
 				this.tour();
-				this.endRecherche=false;
-				this.temps(CHRONO_RECHERCHE);
-				
-				if(this.chronometre==0){
-					this.rFin();
-					this.game.majTourDeJeu();
-					this.currentPhase=PHASE_RECHERCHE;
-				}else
-					this.currentPhase = PHASE_SOUMISSION;
+				this.chronometre= System.currentTimeMillis();
+				synchronized(this){
+					try {
+						System.out.println("DEBUT wait");
+						this.wait(CHRONO_RECHERCHE);
+						}
+						catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+				}
+				this.rFin();
+				this.currentPhase = PHASE_SOUMISSION;
 				break;
 
 			case PHASE_SOUMISSION:
@@ -238,7 +241,7 @@ public class Session extends Thread{
 		return this.game.plateauToString(this.game.getPlateau());
 	}
 
-	public int getChronometre() {
+	public long getChronometre() {
 		return chronometre;
 	}
 
