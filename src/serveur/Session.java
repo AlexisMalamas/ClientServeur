@@ -36,36 +36,10 @@ public class Session extends Thread{
 		this.chronometre=0;
 	}
 
-<<<<<<< HEAD
-	public void run() {
-=======
 	@Override
 	public void run() {
 		
-		/*temps = 300;
-		 * sessionNotEnd
-		 * int lastTimeTimer = 0;
-		 * while(sessionNotEnd)
-		 * {
-		 * 		actualTimeTimer = SDL_GetTicks();
-		 * 		if(actualTimeTimer - lastTimeTimer > 1000) // toutes les 1 sec
-		        {
-		            if(temps>0)
-		                temps--;
-		            lastTimeTimer = SDL_GetTicks();
-		            
-		            if(temps ==0)
-		            {
-		            	nextPhase();
-		            }
-		        }
-		 * 
-		 * }
-		 * 
-		 * 
-		 * 
-		 * */
->>>>>>> branch 'master' of https://github.com/AlexisMalamas/ClientServeur
+		
 
 		while(server.nbPlayer() != 0)// tant que des joueurs sont connectées
 		{
@@ -76,19 +50,15 @@ public class Session extends Thread{
 				break;
 
 			case PHASE_RECHERCHE:
-				this.tour();
-				this.chronometre= System.currentTimeMillis();
-				synchronized(this){
-					try {
-						System.out.println("DEBUT wait");
-						this.wait(CHRONO_RECHERCHE);
-						}
-						catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-				}
-				this.rFin();
-				this.currentPhase = PHASE_SOUMISSION;
+				this.endRecherche=false;
+				this.temps(CHRONO_RECHERCHE);
+				
+				if(this.chronometre==0){
+					this.rFin();
+					this.game.majTourDeJeu();
+					this.currentPhase=PHASE_RECHERCHE;
+				}else
+					this.currentPhase = PHASE_SOUMISSION;
 				break;
 
 			case PHASE_SOUMISSION:
@@ -273,7 +243,7 @@ public class Session extends Thread{
 	public long getChronometre() {
 		return chronometre;
 	}
-<<<<<<< HEAD
+
 
 	public void setChronometre(int chronometre) {
 		this.chronometre = chronometre;
@@ -289,6 +259,4 @@ public class Session extends Thread{
 	}
 
 }
-=======
-}
->>>>>>> branch 'master' of https://github.com/AlexisMalamas/ClientServeur
+

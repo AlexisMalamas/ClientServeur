@@ -169,9 +169,6 @@ public class Serveur {
 		}
 
 	}
-<<<<<<< HEAD
-
-=======
 	
 	public void arreterRecherche() {
 		synchronized (this) {
@@ -234,7 +231,6 @@ public class Serveur {
 		return s;
 	}
 	
->>>>>>> branch 'master' of https://github.com/AlexisMalamas/ClientServeur
 	public int nbPlayer()
 	{
 		return joueurs.size();
