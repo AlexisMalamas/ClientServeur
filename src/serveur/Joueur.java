@@ -177,6 +177,7 @@ public class Joueur extends Thread {
 						String messagePrive = infoMessages[1];
 						String recepteur = infoMessages[2];
 						this.serveur.sendToOneJoueur(ProtocoleCreateur.create(Protocole.PRECEPTION,recepteur ,messagePrive),recepteur);
+					
 					}
 				}
 				if(!normalDeco)
