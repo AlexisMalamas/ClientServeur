@@ -26,6 +26,7 @@ public enum Protocole {
 		
 		// Phase de soumission
 		SVALIDE,
+		SINVALIDE,
 		SFIN,
 
 		

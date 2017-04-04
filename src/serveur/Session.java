@@ -31,44 +31,43 @@ public class Session extends Thread{
 	{
 		this.game = new Game();
 		this.server = server;
-		this.nombreTour=1;
+		this.nombreTour=0;
 		this.currentPhase=PHASE_SESSION;
 		this.chronometre=0;
 	}
 
 	@Override
 	public void run() {
-		
-		
-
-		while(server.nbPlayer() != 0)// tant que des joueurs sont connectées
+		while(server.nbPlayer() != 0 && this.game.nbLettresRestantes()>=7)// tant que des joueurs sont connectées
 		{
 			switch(currentPhase){
 			case PHASE_SESSION:
-				//this.temps(CHRONO_SESSION);
+				this.endRecherche = false;
+				this.chronometre = CHRONO_SESSION;
+				this.temps(CHRONO_SESSION);
 				this.currentPhase = PHASE_RECHERCHE;
 				break;
 
 			case PHASE_RECHERCHE:
+				this.nombreTour++;
 				this.tour();
 				this.endRecherche=false;
 				this.temps(CHRONO_RECHERCHE);
-				
+
 				if(this.chronometre==0){
 					this.rFin();
 					this.game.majTourDeJeu();
 					this.currentPhase=PHASE_RECHERCHE;
 				}else
+				{
 					this.currentPhase = PHASE_SOUMISSION;
+					this.endRecherche = false;
+				}
 				break;
 
 			case PHASE_SOUMISSION:
-
-				try {
-					Thread.sleep(CHRONO_SOUMISSION);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				this.endRecherche = false;
+				this.temps(CHRONO_SOUMISSION);
 
 				this.sFin();
 				this.currentPhase = PHASE_RESULTAT;
@@ -77,14 +76,16 @@ public class Session extends Thread{
 			case PHASE_RESULTAT:
 				this.bilan();
 
-				//this.game.majTourDeJeu();
-				try {
-					Thread.sleep(CHRONO_RESULTAT);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				this.game.majTourDeJeu();
+				for(Joueur j:this.server.getJoueurs())
+				{
+					j.setScore(j.getScore()+j.getScoreTour());
+					j.setScoreTour(0);
 				}
+				this.endRecherche = false;
+				this.temps(CHRONO_RESULTAT);
 
-				this.nombreTour++;
+
 				this.currentPhase = PHASE_RECHERCHE;
 				break;
 
@@ -93,8 +94,8 @@ public class Session extends Thread{
 			}
 		}
 
-		publishResultOnTheWeb();
-
+		this.vainqueur();
+		this.server.saveResults(this.nombreTour);
 	}
 
 	public void debutSession(){
@@ -104,7 +105,7 @@ public class Session extends Thread{
 
 	public void tour(){
 
-		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.TOUR,this.getPlateau(),this.tirageCourant(this.game.getNombreLettreATires())));
+		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.TOUR,this.getPlateau(),this.tirageCourant(7)));
 	}
 
 	public void researchPhase()
@@ -127,14 +128,12 @@ public class Session extends Thread{
 		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.RFIN));
 	}
 
-	public void resultPhase()
+	public void bilan()
 	{
-		this.currentPhase = PHASE_RESULTAT;
 		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.BILAN,this.game.getMeilleurMot(),this.game.getMeilleurJoueur(),this.scoreAllJoueur()));
-
 	}
 
-	public void bilan(){
+	public void vainqueur(){
 		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.VAINQUEUR,this.scoreAllJoueur()));
 
 	}
@@ -171,11 +170,11 @@ public class Session extends Thread{
 	public ArrayList<String> getWords(char[][] proposition){
 		return this.game.createdWords(proposition);
 	}
-	
+
 	public char[][] getStringtoPlateau(String plateauString){
 		return this.game.stringToPlateau(plateauString);
 	}
-	
+
 	public String stringCurrentPhase(){
 		if(this.currentPhase == PHASE_RECHERCHE)
 			return "REC";
@@ -189,16 +188,16 @@ public class Session extends Thread{
 	public int getCalculScore(ArrayList<String> reponses){
 		return this.game.calculScore(reponses);
 	}
-	
-	public void getMajMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition){
-		this.game.majMeilleurScorePlateauMot(score, reponses, proposition);
+
+	public boolean getMajMeilleurScorePlateauMot(int score,ArrayList<String> reponses, char[][] proposition, String pseudo){
+		return this.game.majMeilleurScorePlateauMot(score, reponses, proposition, pseudo);
 	}
-	
+
 	public void temps(int temps){
 		long actualTimer;
 		long lastTimeTimer = 0;
 		this.chronometre = temps;
-		
+
 		while(true){
 			actualTimer=System.currentTimeMillis();
 			if(actualTimer - lastTimeTimer > 1000) // toutes les 1 sec
@@ -207,21 +206,17 @@ public class Session extends Thread{
 					this.chronometre--;
 				}
 				lastTimeTimer = System.currentTimeMillis();
-
-				if(this.endRecherche==true){
-					System.out.println("break endrecherche");
-					break;
+				synchronized(this){
+					if(this.endRecherche){
+						System.out.println("break endrecherche");
+						break;
+					}
 				}
-				
+
 				if(this.chronometre ==0)
 					break;
 			}
 		}
-	}
-
-	public void publishResultOnTheWeb()
-	{
-
 	}
 
 	public int getCurrentPhase()

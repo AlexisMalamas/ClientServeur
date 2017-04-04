@@ -39,17 +39,6 @@ public class Serveur {
 		this.nbwait=0;
 		this.numeroSession = 1;
 		this.nbConnected=0;
-		
-		//Partie HTML
-		/*
-		ArrayList<String> nom = new ArrayList<String>();
-		ArrayList<Integer> scores = new ArrayList<Integer>();
-		nom.add("jean");
-		nom.add("bob");
-		scores.add(10);
-		scores.add(20);
-		saveResults(42,nom,scores);
-		*/
 	}
 
 
@@ -127,7 +116,7 @@ public class Serveur {
 	public void propositionRechercheValide(Joueur j){
 		try {
 			j.sendToJoueur(ProtocoleCreateur.create(Protocole.RVALIDE));
-			sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.RVALIDE,j.getPseudo()), j.getPseudo());
+			sendToAllJoueurButMe(ProtocoleCreateur.create(Protocole.RATROUVE,j.getPseudo()), j.getPseudo());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -173,13 +162,19 @@ public class Serveur {
 
 	}
 	
-	public void arreterRecherche() {
-		synchronized (this) {
-			this.notify();
+	public void sendToOneJoueur(String message, String joueurCourant){
+		for(Joueur j:this.joueurs){
+			try {
+				if(j.getPseudo()!=null && j.getPseudo().equals(joueurCourant))
+					j.sendToJoueur(message);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
 	
-	public void saveResults(int nbTour, ArrayList<String> nom,  ArrayList<Integer> scores)
+	public void saveResults(int nbTour)
 	{
 		String myOutputString	= "";
 		
@@ -187,13 +182,11 @@ public class Serveur {
 		String myLine = null;
 		
 		try{
-			// --- Open the file
 			myInputFile = new RandomAccessFile("resultats.html", "r");
 			
-			// --- Read line per line
 			while (  (myLine = myInputFile.readLine() ) != null){
 				if(myLine.equals("<h1>Resultats des sessions</h1>"))
-					myLine += "\n"+generateHtml(nbTour, nom, scores);
+					myLine += "\n"+generateHtml(nbTour);
 				
 				myOutputString += myLine+"\n";
 			}
@@ -215,16 +208,17 @@ public class Serveur {
 			}
 		}
 	}
-	public String generateHtml(int nbTour, ArrayList<String> nom,  ArrayList<Integer> scores)
+	public String generateHtml(int nbTour)
 	{
 		String s = "<div class=resultats>\n"
 				+"<h2>Session "+this.numeroSession+"</h2>\n"
 				+"<span>Nombre de Tour : "+nbTour+"</span>\n"
 				+"<table>\n"
 				+"<tr><th>Nom du joueur</th><th>score</th></tr>\n";
-		for(int i=0; i<nom.size(); i++)
+		for(int i=0; i<joueurs.size(); i++)
 		{
-			s+="<tr><td>"+nom.get(i)+"</td><td>"+scores.get(i)+"</td></tr>\n";
+			if(joueurs.get(i).getPseudo()!=null)
+				s+="<tr><td>"+joueurs.get(i).getPseudo()+"</td><td>"+joueurs.get(i).getScore()+"</td></tr>\n";
 		}
 		
 		s+="</table>\n"
