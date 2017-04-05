@@ -18,7 +18,7 @@ public enum Protocole {
 		
 		// Phase recherche
 		TOUR,
-		TROUVE, //aussi dans phase de résolution
+		TROUVE, //aussi dans phase de soumission
 		RVALIDE,
 		RINVALIDE,
 		RATROUVE,

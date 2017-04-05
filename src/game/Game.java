@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Game {
 
 	private char[][] plateau;
-	private static int taille = 15;
+	private static int TAILLE = 15;
 	private char[] tirageCourant;
 	private int nombreLettreDisponible;
 	private int scoreMax;
@@ -21,7 +21,7 @@ public class Game {
 	private String meilleurJoueur;
 	private char[][] meilleurPlateau;
 
-	/*position 0 : A donc position 0 : A a pour score 1 etc...
+	/*position 0 : A
 	 * Pas de Joker
 	 * */
 	private int[] alphabetScore = {1,3,3,2,1,4,2,4,1,8,10,1,2,1,1,3,8,1,1,1,1,4,10,10,10,10};
@@ -33,8 +33,8 @@ public class Game {
 		this.scoreMax=0;
 		this.meilleurMot="";
 		this.meilleurJoueur="";
-		for(int i=0;i<taille;i++)
-			for(int j=0; j<taille;j++)
+		for(int i=0;i<TAILLE;i++)
+			for(int j=0; j<TAILLE;j++)
 				this.plateau[i][j]='0';
 	}
 	
@@ -49,18 +49,18 @@ public class Game {
 	public String plateauToString(char[][] plateau){
 		String plateauString="";
 
-		for(int i=0;i<taille;i++)
-			for(int j=0;j<taille;j++)
+		for(int i=0;i<TAILLE;i++)
+			for(int j=0;j<TAILLE;j++)
 				plateauString+=plateau[i][j];
 
 		return plateauString;		
 	}
 
 	public char[][] stringToPlateau(String plateauString){
-		char[][] p = new char[this.taille][this.taille];
-		for(int i = 0; i < this.taille; i++){
-				for(int j = 0; j < this.taille; j++){
-					p[i][j] = plateauString.charAt(i * this.taille + j);
+		char[][] p = new char[TAILLE][TAILLE];
+		for(int i = 0; i < TAILLE; i++){
+				for(int j = 0; j < TAILLE; j++){
+					p[i][j] = plateauString.charAt(i * TAILLE + j);
 				}
 			 }
 		
@@ -184,8 +184,8 @@ public class Game {
 	}
 	
 	public boolean plateauVide(){
-		for(int i=0;i<taille;i++)
-			for(int j=0;j<taille;j++)
+		for(int i=0;i<TAILLE;i++)
+			for(int j=0;j<TAILLE;j++)
 				if(!(this.plateau[i][j]=='0'))
 					return false;
 		return true;
@@ -200,8 +200,8 @@ public class Game {
 		
 		int posI = -1;
 		int posJ = -1;
-		for(int i=0;i<taille;i++)
-			for(int j=0;j<taille;j++)
+		for(int i=0;i<TAILLE;i++)
+			for(int j=0;j<TAILLE;j++)
 				if(proposition[i][j]!=this.plateau[i][j] && posI ==-1 && posJ ==-1)
 				{
 					posI = i;
@@ -262,7 +262,7 @@ public class Game {
 			posJ--;
 		}
 		
-		while(j<taille && proposition[posI][j] != '0')
+		while(j<TAILLE && proposition[posI][j] != '0')
 		{
 			if(proposition[posI][j]!='0')
 				word+=proposition[posI][j];
@@ -283,7 +283,7 @@ public class Game {
 			posI--;
 		}
 		
-		while(i<taille && proposition[i][posJ] != '0')
+		while(i<TAILLE && proposition[i][posJ] != '0')
 		{
 			if(proposition[i][posJ]!='0')
 				word+=proposition[i][posJ];

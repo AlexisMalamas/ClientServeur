@@ -22,8 +22,7 @@ public class Joueur extends Thread {
 	private BufferedReader inchan;
 	private Serveur serveur;
 
-	private boolean estConnecte; 
-	private boolean enAttente;
+	private boolean estConnecte;
 	private boolean normalDeco=false;
 
 	public Joueur(Serveur serveur){
@@ -271,14 +270,5 @@ public class Joueur extends Thread {
 	public void setEstConnecte(boolean isHere) {
 		this.estConnecte = isHere;
 	}
-
-	public boolean getEnAttente() {
-		return enAttente;
-	}
-
-	public void setEnAttente(boolean isWaiting) {
-		this.enAttente = isWaiting;
-	}
-
 
 }

@@ -8,9 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Vector;
-
-
-import game.Game;
 import protocole.*;
 
 public class Serveur {
@@ -18,9 +15,8 @@ public class Serveur {
 	private ServerSocket serverSocket;
 	private ArrayList<Joueur> joueurs;
 	private Vector<Socket> sockets;
-	private Socket	joueur;
 	public final static int port=2017;
-	public final static int capacite=2;
+	public final static int capacite=10;
 	
 	private int nbwait;
 	private int nbConnected;
@@ -43,13 +39,13 @@ public class Serveur {
 
 
 
-	public void run() {
+	public void start() {
 		try {
 			serverSocket = new ServerSocket(port);
 			System.out.println("Attente connexion joueurs.");
 
 			while(true){
-				joueur = serverSocket.accept();
+				Socket joueur = serverSocket.accept();
 				synchronized (this)
 				{
 
