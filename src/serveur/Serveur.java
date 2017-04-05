@@ -225,9 +225,14 @@ public class Serveur {
 		return s;
 	}
 	
-	public int nbPlayer()
+	public int getNbConnected()
 	{
-		return joueurs.size();
+		return this.nbConnected;
+	}
+	
+	public void setNbConnected(int nb)
+	{
+		this.nbConnected = nb;
 	}
 
 	public ArrayList<Joueur> getJoueurs() {

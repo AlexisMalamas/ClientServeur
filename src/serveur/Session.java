@@ -33,15 +33,26 @@ public class Session extends Thread{
 		this.server = server;
 		this.nombreTour=0;
 		this.currentPhase=PHASE_SESSION;
-		this.chronometre=0;
+		this.chronometre=CHRONO_SESSION;
 	}
 
 	@Override
 	public void run() {
-		while(server.nbPlayer() != 0 && this.game.nbLettresRestantes()>=7)// tant que des joueurs sont connectées
+		while(this.game.nbLettresRestantes()>=7)// tant que des joueurs sont connectées
 		{
+			synchronized(this)
+			{
+				if(this.server.getNbConnected()==0)
+				{
+					break;
+				}
+			}
+			
+			
+			
 			switch(currentPhase){
 			case PHASE_SESSION:
+				debutSession();
 				this.endRecherche = false;
 				this.chronometre = CHRONO_SESSION;
 				this.temps(CHRONO_SESSION);
@@ -74,14 +85,14 @@ public class Session extends Thread{
 				break;
 
 			case PHASE_RESULTAT:
-				this.bilan();
-
-				this.game.majTourDeJeu();
+				
 				for(Joueur j:this.server.getJoueurs())
 				{
 					j.setScore(j.getScore()+j.getScoreTour());
 					j.setScoreTour(0);
 				}
+				this.bilan();
+				this.game.majTourDeJeu();
 				this.endRecherche = false;
 				this.temps(CHRONO_RESULTAT);
 
@@ -108,20 +119,8 @@ public class Session extends Thread{
 		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.TOUR,this.getPlateau(),this.tirageCourant(7)));
 	}
 
-	public void researchPhase()
-	{
-		this.currentPhase = PHASE_RECHERCHE;
-	}
-
 	public void sFin(){
 		this.server.sendToAllJoueur(ProtocoleCreateur.create(Protocole.SFIN));
-	}
-
-	public void submissionPhase()
-	{
-		this.currentPhase = PHASE_SOUMISSION;
-
-
 	}
 
 	public void rFin(){
@@ -207,7 +206,7 @@ public class Session extends Thread{
 				}
 				lastTimeTimer = System.currentTimeMillis();
 				synchronized(this){
-					if(this.endRecherche){
+					if(this.endRecherche || this.server.getNbConnected()==0){
 						System.out.println("break endrecherche");
 						break;
 					}

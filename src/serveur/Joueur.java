@@ -109,6 +109,9 @@ public class Joueur extends Thread {
 							synchronized(this.serveur)
 							{
 								this.serveur.removeJoueur(this);
+								this.pseudo = null;
+								this.score = 0;
+								this.scoreTour = 0;
 							}
 							
 							System.out.println("Deonnexion de " + this.pseudo);
@@ -180,7 +183,12 @@ public class Joueur extends Thread {
 					}
 				}
 				if(!normalDeco)
+				{
 					this.serveur.removeJoueur(this);
+					this.pseudo = null;
+					this.score = 0;
+					this.scoreTour = 0;
+				}
 				this.socket.close();
 			}catch (Exception e) {
 				System.out.println("(Joueur run) Exception : "+e.toString());
