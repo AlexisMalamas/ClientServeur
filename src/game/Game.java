@@ -96,7 +96,7 @@ public class Game {
 				if(reponses.size()==1)
 					this.meilleurMot+=r;
 				else
-					this.meilleurMot+=r;
+					this.meilleurMot+=r+"--";
 			}
 			this.meilleurPlateau=proposition;
 			return true;
@@ -158,10 +158,6 @@ public class Game {
 			
 			String ligne;
 			
-			
-			for(String r:mots)
-				System.out.println(r);
-
 			while ((ligne=buff.readLine())!=null){
 				for(String mot: mots){
 					ligne=Normalizer.normalize(ligne, Normalizer.Form.NFD);
@@ -176,7 +172,6 @@ public class Game {
 		}catch (Exception e){
 			System.out.println(e.toString());
 		}
-		System.out.println(compt);
 		if(compt==mots.size())
 			return true;
 		else
@@ -247,7 +242,6 @@ public class Game {
 		if(motsValide(wordsCreated))
 			return wordsCreated;
 		else{
-			System.out.println("ici pas bon 2");
 			return null;
 		}
 	}

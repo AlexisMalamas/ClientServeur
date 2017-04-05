@@ -7,7 +7,9 @@ import java.io.RandomAccessFile;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
+
 import protocole.*;
 
 public class Serveur {
@@ -171,8 +173,9 @@ public class Serveur {
 
 	}
 	
-	public void saveResults(int nbTour)
+	public void saveResults(HashMap<String, Integer> listJoueurs, int nbTour)
 	{
+
 		String myOutputString	= "";
 		
 		RandomAccessFile myInputFile = null;
@@ -180,10 +183,10 @@ public class Serveur {
 		
 		try{
 			myInputFile = new RandomAccessFile("resultats.html", "r");
-			
+
 			while (  (myLine = myInputFile.readLine() ) != null){
 				if(myLine.equals("<h1>Resultats des sessions</h1>"))
-					myLine += "\n"+generateHtml(nbTour);
+					myLine += "\n"+generateHtml(listJoueurs, nbTour);
 				
 				myOutputString += myLine+"\n";
 			}
@@ -205,17 +208,17 @@ public class Serveur {
 			}
 		}
 	}
-	public String generateHtml(int nbTour)
+	public String generateHtml(HashMap<String, Integer> listJoueurs,int nbTour)
 	{
 		String s = "<div class=resultats>\n"
 				+"<h2>Session "+this.numeroSession+"</h2>\n"
 				+"<span>Nombre de Tour : "+nbTour+"</span>\n"
 				+"<table>\n"
 				+"<tr><th>Nom du joueur</th><th>score</th></tr>\n";
-		for(int i=0; i<joueurs.size(); i++)
-		{
-			if(joueurs.get(i).getPseudo()!=null)
-				s+="<tr><td>"+joueurs.get(i).getPseudo()+"</td><td>"+joueurs.get(i).getScore()+"</td></tr>\n";
+		
+		for (String mapKey : listJoueurs.keySet()) {
+			if(!mapKey.equals("null"))
+				s+="<tr><td>"+mapKey+"</td><td>"+listJoueurs.get(mapKey)+"</td></tr>\n";
 		}
 		
 		s+="</table>\n"

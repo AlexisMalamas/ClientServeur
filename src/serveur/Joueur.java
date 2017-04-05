@@ -96,6 +96,10 @@ public class Joueur extends Thread {
 								this.pseudo = infoMessages[1];
 								System.out.println("Nouvelle connexion d'un client nomme " + this.pseudo);
 								synchronized (serveur){this.serveur.addJoueur(this);}
+								synchronized (serveur.getSession())
+								{
+									this.serveur.getSession().addJoueurs(this.pseudo);
+								}
 							}
 							
 						}catch (Exception e) {
@@ -103,7 +107,8 @@ public class Joueur extends Thread {
 							System.out.println(e);
 						}
 					}else if(Protocole.SORT.name().equals(cmd)){
-						if(this.pseudo.equals(infoMessages[1])){
+						if(this.pseudo.equals(infoMessages[1]))
+						{
 							this.estConnecte=false;
 							this.normalDeco=true;
 							synchronized(this.serveur)
@@ -113,9 +118,6 @@ public class Joueur extends Thread {
 								this.score = 0;
 								this.scoreTour = 0;
 							}
-							
-							System.out.println("Deonnexion de " + this.pseudo);
-
 						}
 
 					}else if(Protocole.TROUVE.name().equals(cmd)){

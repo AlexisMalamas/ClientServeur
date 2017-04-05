@@ -1,6 +1,7 @@
 package serveur;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import game.Game;
 import protocole.Protocole;
@@ -14,6 +15,9 @@ public class Session extends Thread{
 	private int nombreTour;
 	private long chronometre;
 	private boolean endRecherche;
+	
+	// ajout pour qu'un client déco puisse être dans le tableau des scores finales
+	private HashMap<String,Integer> joueurs;
 
 	//Chrono en milliseconds
 	private final static int CHRONO_SESSION = 20;
@@ -34,6 +38,8 @@ public class Session extends Thread{
 		this.nombreTour=0;
 		this.currentPhase=PHASE_SESSION;
 		this.chronometre=CHRONO_SESSION;
+		
+		this.joueurs = new HashMap<String,Integer>();
 	}
 
 	@Override
@@ -47,8 +53,6 @@ public class Session extends Thread{
 					break;
 				}
 			}
-			
-			
 			
 			switch(currentPhase){
 			case PHASE_SESSION:
@@ -85,12 +89,13 @@ public class Session extends Thread{
 				break;
 
 			case PHASE_RESULTAT:
-				
 				for(Joueur j:this.server.getJoueurs())
 				{
 					j.setScore(j.getScore()+j.getScoreTour());
 					j.setScoreTour(0);
+					joueurs.put(j.getPseudo(), j.getScore());
 				}
+				
 				this.bilan();
 				this.game.majTourDeJeu();
 				this.endRecherche = false;
@@ -104,9 +109,9 @@ public class Session extends Thread{
 				break;
 			}
 		}
-
+		
 		this.vainqueur();
-		this.server.saveResults(this.nombreTour);
+		this.server.saveResults(this.joueurs ,this.nombreTour);
 	}
 
 	public void debutSession(){
@@ -207,7 +212,6 @@ public class Session extends Thread{
 				lastTimeTimer = System.currentTimeMillis();
 				synchronized(this){
 					if(this.endRecherche || this.server.getNbConnected()==0){
-						System.out.println("break endrecherche");
 						break;
 					}
 				}
@@ -251,6 +255,11 @@ public class Session extends Thread{
 
 	public void setEndRecherche(boolean endRecherche) {
 		this.endRecherche = endRecherche;
+	}
+	
+	public void addJoueurs(String s)
+	{
+		this.joueurs.put(s, 0);
 	}
 
 }
